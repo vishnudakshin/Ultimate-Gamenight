@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="/support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Anton&amp;display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#070410;font-family:'Poppins',system-ui,sans-serif;color:#F3E8FF}
+input,button,textarea{font-family:'Poppins',sans-serif}
+input:focus,textarea:focus{outline:none}
+.gn-scroll::-webkit-scrollbar{width:8px}
+.gn-scroll::-webkit-scrollbar-thumb{background:rgba(192,132,252,.3);border-radius:8px}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes sweep{0%{transform:translateX(-24%) rotate(9deg)}50%{transform:translateX(24%) rotate(9deg)}100%{transform:translateX(-24%) rotate(9deg)}}
+@keyframes glowpulse{0%,100%{box-shadow:0 0 14px rgba(244,201,93,.3),inset 0 0 8px rgba(244,201,93,.1)}50%{box-shadow:0 0 28px rgba(244,201,93,.7),inset 0 0 14px rgba(244,201,93,.22)}}
+@keyframes neon{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes drift{0%{transform:translateY(-10px) rotate(0);opacity:0}12%{opacity:1}100%{transform:translateY(100vh) rotate(300deg);opacity:0}}
+@keyframes buzzsh{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px)}75%{transform:translateY(3px)}}
+@keyframes flashin{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 50% -15%,#1c1140 0%,#0c0718 58%,#070410 100%)">
+
+<!-- ===================== HOME ===================== -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(244,201,93,.06) 50%,transparent 60%);animation:sweep 8s ease-in-out infinite;pointer-events:none"></div>
+  <div style="position:relative;height:100%">
+    <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:24px">
+      <sc-if value="{{ showHostBadge }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;border:1.5px solid rgba(244,201,93,.6);border-radius:999px;padding:7px 16px;margin-bottom:18px;box-shadow:0 0 18px rgba(244,201,93,.25)"><i class="ti ti-diamonds" style="font-size:14px;color:#F4C95D"></i><span style="font:700 11px 'Poppins';letter-spacing:.32em;color:#F4C95D">GAME SHOW HOST</span></div>
+      </sc-if>
+      <div style="font:400 20px 'Anton';letter-spacing:.42em;color:#C084FC;text-shadow:0 0 16px rgba(192,132,252,.5)">ULTIMATE</div>
+      <div style="font:400 clamp(64px,13vw,150px) 'Anton';line-height:.9;letter-spacing:.02em;color:#F4C95D;text-shadow:0 0 40px rgba(244,201,93,.55),0 0 90px rgba(244,201,93,.25)">GAMENIGHT</div>
+      <sc-if value="{{ showTagline }}" hint-placeholder-val="{{ false }}">
+        <div style="font:500 14px 'Poppins';color:#c9b6ee;letter-spacing:.04em;margin-top:6px;max-width:460px">Host a trivia &amp; board-game night. Pick your rounds, feed your own questions, and light up the room.</div>
+      </sc-if>
+      <sc-if value="{{ showHomeStats }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:22px;margin-top:26px;color:#8f74c4;font:600 11px 'Poppins'">
+          <span style="display:flex;align-items:center;gap:6px"><i class="ti ti-layout-grid" style="font-size:14px;color:#C084FC"></i>9 categories</span>
+          <span style="display:flex;align-items:center;gap:6px"><i class="ti ti-photo-up" style="font-size:14px;color:#C084FC"></i>Your own content</span>
+          <span style="display:flex;align-items:center;gap:6px"><i class="ti ti-trophy" style="font-size:14px;color:#C084FC"></i>Live leaderboard</span>
+        </div>
+      </sc-if>
+    </div>
+    <button onClick="{{ goSetup }}" style="position:absolute;left:20px;bottom:20px;display:flex;align-items:center;gap:7px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 12px 'Poppins';border:none;border-radius:999px;padding:9px 18px;cursor:pointer;box-shadow:0 0 18px rgba(244,201,93,.4)"><i class="ti ti-player-play-filled" style="font-size:13px"></i>New Game Night</button>
+    <button onClick="{{ goSaved }}" style="position:absolute;right:20px;bottom:20px;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.4);color:#c9b6ee;font:700 12px 'Poppins';border-radius:999px;padding:9px 18px;cursor:pointer"><i class="ti ti-folder" style="font-size:13px"></i>Saved Game Nights</button>
+  </div>
+</sc-if>
+
+<!-- ===================== SAVED LIST ===================== -->
+<sc-if value="{{ isSavedList }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid rgba(192,132,252,.14);flex:none">
+      <div style="display:flex;align-items:center;gap:9px;cursor:pointer" onClick="{{ goHome }}"><i class="ti ti-arrow-left" style="font-size:15px;color:#C084FC"></i><span style="font:700 12px 'Poppins';color:#c9b6ee">Home</span></div>
+      <div style="font:400 15px 'Anton';letter-spacing:.06em;color:#F4C95D">SAVED GAME NIGHTS</div>
+      <div style="width:64px"></div>
+    </div>
+    <div class="gn-scroll" style="flex:1;overflow-y:auto;padding:24px 26px">
+      <sc-if value="{{ hasNoSaves }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;margin-top:60px;color:#6B4FA0">
+          <i class="ti ti-mood-empty" style="font-size:40px"></i>
+          <div style="font:600 13px 'Poppins';margin-top:10px">No saved game nights yet</div>
+          <div style="font:500 11px 'Poppins';margin-top:4px;color:#8f74c4">Build a show, then save it from the players step.</div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ savedList }}" as="sv" hint-placeholder-count="0">
+        <div style="display:flex;align-items:center;gap:14px;background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:14px;padding:14px 18px;margin-bottom:10px">
+          <div style="flex:1;min-width:0"><div style="font:700 14px 'Poppins';color:#F3E8FF">{{ sv.name }}</div><div style="font:500 10px 'Poppins';color:#8f74c4">{{ sv.dateLabel }} · {{ sv.catCount }} categories</div></div>
+          <button onClick="{{ sv.onLoad }}" style="display:flex;align-items:center;gap:6px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 11px 'Poppins';border:none;border-radius:999px;padding:8px 16px;cursor:pointer"><i class="ti ti-player-play-filled" style="font-size:12px"></i>Load</button>
+          <i class="ti ti-trash" onClick="{{ sv.onDelete }}" style="font-size:16px;color:#8f74c4;cursor:pointer"></i>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== SETUP ===================== -->
+<sc-if value="{{ isSetup }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column">
+    <!-- header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid rgba(192,132,252,.14);flex:none">
+      <div style="display:flex;align-items:center;gap:9px;cursor:pointer" onClick="{{ goHome }}"><i class="ti ti-diamonds" style="font-size:13px;color:#F4C95D"></i><span style="font:400 15px 'Anton';letter-spacing:.06em;color:#F4C95D">ULTIMATE GAMENIGHT</span></div>
+      <div style="display:flex;gap:8px">
+        <span style="{{ step1Pill }}">1 · Categories</span>
+        <span style="{{ step2Pill }}">2 · Content</span>
+        <span style="{{ step3Pill }}">3 · Players</span>
+      </div>
+      <div style="width:170px;text-align:right;font:600 11px 'Poppins';color:#8f74c4">{{ rulesSummary }}</div>
+    </div>
+
+    <!-- STEP 1: CATEGORIES -->
+    <sc-if value="{{ isStep1 }}">
+      <div class="gn-scroll" style="flex:1;overflow-y:auto;padding:22px 26px 90px">
+        <div style="font:700 10px 'Poppins';letter-spacing:.16em;text-transform:uppercase;color:#C084FC">Build your show</div>
+        <div style="font:800 24px 'Poppins';color:#F3E8FF;margin:2px 0 4px">Choose categories &amp; set the rules</div>
+        <div style="font:500 12px 'Poppins';color:#8f74c4;margin-bottom:18px">Toggle rounds on, then dial in questions, timer per question, and points per correct answer.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+          <sc-for list="{{ setupCats }}" as="cat" hint-placeholder-count="8">
+            <div style="width: 263px; height: 115px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                <div style="display:flex;align-items:center;gap:9px"><i class="ti {{ cat.icon }}" style="{{ cat.iconStyle }}"></i><div><div style="font:700 13px 'Poppins';color:{{ cat.nameColor }}">{{ cat.name }}</div><div style="font:600 8px monospace;letter-spacing:.1em;color:#8f74c4">{{ cat.tag }} · {{ cat.kindLabel }}</div></div></div>
+                <div onClick="{{ cat.onToggle }}" style="{{ cat.switchStyle }}"><div style="{{ cat.knobStyle }}"></div></div>
+              </div>
+              <sc-if value="{{ cat.on }}">
+                <div style="display:flex;gap:7px;margin-top:4px">
+                  <div style="flex:1;background:rgba(0,0,0,.25);border-radius:9px;padding:6px 8px;text-align:center">
+                    <div style="font:600 8px 'Poppins';letter-spacing:.08em;color:#8f74c4;text-transform:uppercase">Q's</div>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px"><i class="ti ti-minus" onClick="{{ cat.qDec }}" style="font-size:13px;color:#C084FC;cursor:pointer"></i><span style="font:400 14px 'Anton';color:#F3E8FF;min-width:20px">{{ cat.questions }}</span><i class="ti ti-plus" onClick="{{ cat.qInc }}" style="font-size:13px;color:#C084FC;cursor:pointer"></i></div>
+                  </div>
+                  <div style="flex:1;background:rgba(0,0,0,.25);border-radius:9px;padding:6px 8px;text-align:center">
+                    <div style="font:600 8px 'Poppins';letter-spacing:.08em;color:#8f74c4;text-transform:uppercase">Timer</div>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px"><i class="ti ti-minus" onClick="{{ cat.tDec }}" style="font-size:13px;color:#C084FC;cursor:pointer"></i><span style="font:400 12px 'Anton';color:#F3E8FF;min-width:34px">{{ cat.timerLabel }}</span><i class="ti ti-plus" onClick="{{ cat.tInc }}" style="font-size:13px;color:#C084FC;cursor:pointer"></i></div>
+                  </div>
+                  
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- STEP 2: CONTENT -->
+    <sc-if value="{{ isStep2 }}">
+      <div style="flex:1;display:flex;overflow:hidden">
+        <div class="gn-scroll" style="width:230px;flex:none;border-right:1px solid rgba(192,132,252,.14);overflow-y:auto;padding:18px 14px">
+          <div style="font:700 9px 'Poppins';letter-spacing:.14em;text-transform:uppercase;color:#8f74c4;margin-bottom:10px;padding:0 4px">Rounds</div>
+          <sc-for list="{{ contentRail }}" as="r" hint-placeholder-count="5">
+            <div onClick="{{ r.onSelect }}" style="{{ r.railStyle }}">
+              <i class="ti {{ r.icon }}" style="font-size:16px;color:{{ r.iconColor }}"></i>
+              <div style="flex:1"><div style="font:700 11px 'Poppins';color:{{ r.nameColor }}">{{ r.name }}</div><div style="font:600 8px monospace;color:#8f74c4">{{ r.fillLabel }}</div></div>
+              <i class="ti {{ r.checkIcon }}" style="font-size:14px;color:{{ r.checkColor }}"></i>
+            </div>
+          </sc-for>
+        </div>
+        <div class="gn-scroll" style="flex:1;overflow-y:auto;padding:22px 26px 40px">
+          <div style="font:700 10px 'Poppins';letter-spacing:.16em;text-transform:uppercase;color:#C084FC">Feed your content</div>
+          <div style="display:flex;align-items:center;gap:10px;margin:2px 0 4px"><i class="ti {{ selIcon }}" style="font-size:22px;color:#F4C95D"></i><div style="font:800 22px 'Poppins';color:#F3E8FF">{{ selName }}</div></div>
+          <div style="font:500 12px 'Poppins';color:#8f74c4;margin-bottom:18px">{{ selHint }}</div>
+          <sc-if value="{{ contentIsImage }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
+              <sc-for list="{{ contentItems }}" as="it" hint-placeholder-count="5">
+                <div style="background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <div style="font:700 9px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#C084FC">Question {{ it.num }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.3);border-radius:7px;padding:3px 7px">
+                      <i class="ti ti-minus" onClick="{{ it.pDec }}" style="font-size:12px;color:#F4C95D;cursor:pointer"></i>
+                      <span style="font:400 13px 'Anton';color:#F4C95D;min-width:14px;text-align:center">{{ it.points }}</span>
+                      <i class="ti ti-plus" onClick="{{ it.pInc }}" style="font-size:12px;color:#F4C95D;cursor:pointer"></i>
+                    </div>
+                  </div>
+                  <label style="{{ it.dropStyle }}">
+                    <sc-if value="{{ it.hasImage }}" hint-placeholder-val="{{ false }}"><div style="{{ it.imgBoxStyle }}"></div></sc-if>
+                    <sc-if value="{{ it.noImage }}"><i class="ti ti-photo-up" style="font-size:26px;color:#a98fd0"></i><span style="font:600 9px monospace;color:#c9b6ee">UPLOAD IMAGE</span></sc-if>
+                    <input type="file" accept="image/*" onChange="{{ it.onUpload }}" style="display:none">
+                  </label>
+                  <input placeholder="Answer (revealed by host)" onChange="{{ it.onAnswer }}" value="{{ it.answer }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.25);border-radius:8px;color:#F4C95D;font:600 11px 'Poppins';padding:8px">
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ contentIsStack }}">
+            <div style="display:flex;flex-direction:column;gap:14px;max-width:840px">
+              <sc-for list="{{ contentItems }}" as="it" hint-placeholder-count="4">
+                <div style="background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <div style="font:700 10px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#C084FC">Question {{ it.num }}</div>
+                    <sc-if value="{{ it.showPoints }}">
+                      <div style="display:flex;align-items:center;gap:8px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.3);border-radius:8px;padding:5px 10px">
+                        <span style="font:600 8px 'Poppins';letter-spacing:.08em;color:#e0b34a;text-transform:uppercase">Points</span>
+                        <i class="ti ti-minus" onClick="{{ it.pDec }}" style="font-size:14px;color:#F4C95D;cursor:pointer"></i>
+                        <span style="font:400 16px 'Anton';color:#F4C95D;min-width:18px;text-align:center">{{ it.points }}</span>
+                        <i class="ti ti-plus" onClick="{{ it.pInc }}" style="font-size:14px;color:#F4C95D;cursor:pointer"></i>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ it.isTriviaKind }}">
+                    <textarea placeholder="Type the trivia question…" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" rows="2" style="width:100%;resize:vertical;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:8px;color:#F3E8FF;font:500 13px 'Poppins';padding:11px"></textarea>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ it.options }}" as="opt" hint-placeholder-count="4">
+                        <div style="{{ opt.rowStyle }}">
+                          <div onClick="{{ opt.onMark }}" style="{{ opt.dotStyle }}"></div>
+                          <input placeholder="Answer choice" onChange="{{ opt.onText }}" value="{{ opt.text }}" style="flex:1;min-width:0;background:transparent;border:none;color:#F3E8FF;font:600 12px 'Poppins'">
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="font:500 9px 'Poppins';color:#8f74c4">Tap the dot to mark the correct answer.</div>
+                  </sc-if>
+                  <sc-if value="{{ it.isWordleKind }}">
+                    <div style="font:500 11px 'Poppins';color:#8f74c4">Type the secret word players must guess in 6 tries.</div>
+                    <input placeholder="SECRET WORD" value="{{ it.word }}" onChange="{{ it.onWord }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.3);border-radius:10px;color:#F4C95D;font:400 26px 'Anton';letter-spacing:.34em;text-transform:uppercase;padding:14px 16px">
+                  </sc-if>
+                  <sc-if value="{{ it.isBeeKind }}">
+                    <div style="font:500 11px 'Poppins';color:#8f74c4">Enter a 7-letter word (all letters used = the pangram) and the center letter every answer must include.</div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                      <div style="flex:1;min-width:200px">
+                        <div style="font:600 8px 'Poppins';letter-spacing:.1em;color:#8f74c4;text-transform:uppercase;margin-bottom:4px">7-letter word</div>
+                        <input placeholder="e.g. MELTING" value="{{ it.word }}" onChange="{{ it.onWord }}" style="width:100%;background:#0d0722;border:1px solid rgba(192,132,252,.25);border-radius:10px;color:#F3E8FF;font:400 24px 'Anton';letter-spacing:.24em;text-transform:uppercase;padding:12px 14px">
+                      </div>
+                      <div style="width:110px">
+                        <div style="font:600 8px 'Poppins';letter-spacing:.1em;color:#e0b34a;text-transform:uppercase;margin-bottom:4px">Center</div>
+                        <input placeholder="M" value="{{ it.center }}" onChange="{{ it.onCenter }}" style="width:100%;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.4);border-radius:10px;color:#F4C95D;font:400 24px 'Anton';text-transform:uppercase;text-align:center;padding:12px">
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ it.isGridKind }}">
+                    <div style="font:500 11px 'Poppins';color:#8f74c4">Build 4 groups of 4. Name each group and type its four words — that's the right combination players must find.</div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ it.groups }}" as="g" hint-placeholder-count="4">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <div style="width:12px;height:12px;border-radius:3px;background:{{ g.color }};flex:none"></div>
+                          <input placeholder="Group name" value="{{ g.name }}" onChange="{{ g.onName }}" style="width:132px;flex:none;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:7px;color:#F3E8FF;font:600 11px 'Poppins';padding:8px">
+                          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:1">
+                            <sc-for list="{{ g.words }}" as="w" hint-placeholder-count="4">
+                              <input placeholder="Word" value="{{ w.value }}" onChange="{{ w.onChange }}" style="width:100%;min-width:0;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:7px;color:#F3E8FF;font:600 11px 'Poppins';padding:8px 4px;text-align:center;text-transform:uppercase">
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- STEP 3: PLAYERS -->
+    <sc-if value="{{ isStep3 }}">
+      <div class="gn-scroll" style="flex:1;overflow-y:auto;padding:22px 26px 90px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font:700 10px 'Poppins';letter-spacing:.16em;text-transform:uppercase;color:#C084FC">Who's playing?</div>
+            <div style="font:800 24px 'Poppins';color:#F3E8FF">Add your contestants</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button onClick="{{ openSaveDialog }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(244,201,93,.4);color:#F4C95D;font:700 11px 'Poppins';border-radius:999px;padding:8px 15px;cursor:pointer"><i class="ti ti-device-floppy" style="font-size:14px"></i>Save game night</button>
+            <div onClick="{{ toggleTeams }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;background:#150c30;border:1px solid rgba(192,132,252,.2);border-radius:999px;padding:7px 14px">
+              <span style="font:600 11px 'Poppins';color:{{ soloColor }}">Solo</span>
+              <div style="{{ teamSwitchStyle }}"><div style="{{ teamKnobStyle }}"></div></div>
+              <span style="font:600 11px 'Poppins';color:{{ teamColor }}">Teams</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+          <sc-for list="{{ players }}" as="p" hint-placeholder-count="4">
+            <div style="background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:14px;padding:12px;display:flex;align-items:center;gap:11px">
+              <div style="width:38px;height:38px;border-radius:10px;background:{{ p.color }};color:#1a0b2e;font:400 15px 'Anton';display:flex;align-items:center;justify-content:center;flex:none">{{ p.initials }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <input value="{{ p.name }}" onChange="{{ p.onName }}" style="width:100%;background:transparent;border:none;border-bottom:1px solid rgba(192,132,252,.25);color:#F3E8FF;font:700 13px 'Poppins';padding:4px 2px">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ p.swatches }}" as="sw" hint-placeholder-count="8">
+                    <div onClick="{{ sw.onClick }}" style="{{ sw.dotStyle }}"></div>
+                  </sc-for>
+                </div>
+              </div>
+              <i class="ti ti-x" onClick="{{ p.onRemove }}" style="font-size:15px;color:#8f74c4;cursor:pointer;align-self:flex-start"></i>
+            </div>
+          </sc-for>
+          <div onClick="{{ addPlayer }}" style="border:1px dashed rgba(192,132,252,.35);border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;color:#C084FC;font:700 12px 'Poppins';min-height:62px"><i class="ti ti-plus" style="font-size:16px"></i>Add {{ playerNoun }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- footer nav -->
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:14px 26px;border-top:1px solid rgba(192,132,252,.14);background:rgba(12,7,24,.6)">
+      <button onClick="{{ prevStep }}" style="{{ backBtnStyle }}"><i class="ti ti-arrow-left" style="font-size:14px"></i>Back</button>
+      <div style="font:600 11px 'Poppins';color:#8f74c4">{{ stepHint }}</div>
+      <button onClick="{{ nextStep }}" style="display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 13px 'Poppins';border:none;border-radius:999px;padding:11px 22px;cursor:pointer;box-shadow:0 0 20px rgba(244,201,93,.4)">{{ nextLabel }}<i class="ti {{ nextIcon }}" style="font-size:15px"></i></button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== BOARD (pick a topic) ===================== -->
+<sc-if value="{{ isBoard }}">
+  <div class="gn-scroll" style="position:relative;height:100%;overflow-y:auto;padding:26px 30px 60px">
+    <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.05) 50%,transparent 58%);animation:sweep 9s ease-in-out infinite;pointer-events:none"></div>
+    <button onClick="{{ goToPlayers }}" style="position:absolute;left:30px;top:26px;z-index:5;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.4);color:#c9b6ee;font:700 12px 'Poppins';border-radius:999px;padding:9px 16px;cursor:pointer"><i class="ti ti-arrow-left" style="font-size:14px"></i>Players</button>
+    <div style="position:relative;text-align:center;margin-bottom:10px">
+      <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">Pick a topic</div>
+      <div style="font:400 clamp(26px,4vw,42px) 'Anton';color:#F4C95D;letter-spacing:.02em">{{ pickerName }}'S TURN</div>
+    </div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:20px;max-width:920px;margin:20px auto 0">
+      <sc-for list="{{ boardCats }}" as="bc" hint-placeholder-count="4">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:9px">
+            <i class="ti {{ bc.icon }}" style="font-size:19px;color:#F4C95D"></i>
+            <div style="font:400 24px 'Anton';color:#fff2cf;letter-spacing:.02em">{{ bc.punTitle }}</div>
+            <div style="font:600 10px 'Poppins';color:#8f74c4">+{{ bc.points }} pts · {{ bc.remaining }} left</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <sc-for list="{{ bc.qButtons }}" as="qb" hint-placeholder-count="6">
+              <button onClick="{{ qb.onClick }}" disabled="{{ qb.disabled }}" style="{{ qb.style }}">{{ qb.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="position:relative;display:flex;justify-content:center;margin-top:30px">
+      <button onClick="{{ endGame }}" style="display:flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(244,201,93,.4);color:#F4C95D;font:700 12px 'Poppins';border-radius:999px;padding:11px 22px;cursor:pointer"><i class="ti ti-trophy" style="font-size:15px"></i>Standings</button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== PLAY ===================== -->
+<sc-if value="{{ isPlay }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column">
+    <sc-if value="{{ flashRight }}"><div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(94,240,168,.28),transparent 70%);z-index:40;pointer-events:none;animation:flashin .8s ease-out"></div></sc-if>
+    <sc-if value="{{ flashWrong }}"><div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(248,113,113,.3),transparent 70%);z-index:40;pointer-events:none;animation:flashin .8s ease-out"></div></sc-if>
+    <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.05) 50%,transparent 58%);animation:sweep 9s ease-in-out infinite;pointer-events:none"></div>
+
+    <!-- top bar -->
+    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:15px 26px;flex:none">
+      <div style="display:flex;align-items:center;gap:9px;background:rgba(12,7,24,.6);border:1px solid #F4C95D;border-radius:999px;padding:6px 14px;box-shadow:0 0 16px rgba(244,201,93,.3)"><i class="ti {{ curCatIcon }}" style="font-size:16px;color:#F4C95D"></i><span style="font:400 17px 'Anton';letter-spacing:.04em;color:#fff2cf">{{ curCatPun }}</span></div>
+      <div style="text-align:center"><div style="font:700 8px 'Poppins';letter-spacing:.3em;color:#C084FC">QUESTION</div><div style="font:400 22px 'Anton';color:#F3E8FF;line-height:1">{{ qLabel }}</div></div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="text-align:right"><div style="font:700 8px 'Poppins';letter-spacing:.1em;color:#8f74c4;text-transform:uppercase">Worth</div><div style="font:400 20px 'Anton';color:#F4C95D">+{{ curPoints }}</div></div>
+        <div style="width:72px;height:72px;border-radius:50%;background:{{ timerRing }};display:flex;align-items:center;justify-content:center;{{ timerAnim }}"><div style="width:58px;height:58px;border-radius:50%;background:#0c0718;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font:400 20px 'Anton';color:{{ timerColor }};line-height:1">{{ timeLabel }}</div></div></div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div style="position:relative;flex:1;display:flex;gap:16px;padding:4px 26px 0;min-height:0">
+      <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div style="flex:1;border-radius:16px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;{{ stageStyle }}">
+          <sc-if value="{{ showImage }}" hint-placeholder-val="{{ false }}"><div style="{{ curImageStyle }}"></div></sc-if>
+          <sc-if value="{{ showImagePlaceholder }}"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><i class="ti ti-photo" style="font-size:44px;color:#a98fd0"></i><div style="font:700 12px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 10px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div></sc-if>
+          <sc-if value="{{ showTriviaBlock }}">
+            <div style="padding:24px;display:flex;flex-direction:column;gap:18px;width:100%;height:100%;align-items:center;justify-content:center">
+              <div style="font:700 clamp(20px,2.6vw,32px) 'Poppins';color:#F3E8FF;text-align:center;text-wrap:balance">{{ curPrompt }}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px">
+                <sc-for list="{{ triviaOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.text }}</div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ notRevealed }}"><button onClick="{{ reveal }}" style="display:flex;align-items:center;gap:9px;background:#7C3AED;color:#fff;font:700 13px 'Poppins';border:none;border-radius:12px;padding:11px 24px;cursor:pointer;box-shadow:0 0 20px rgba(124,58,237,.5)"><i class="ti ti-eye" style="font-size:16px"></i>Reveal answer</button></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showConnPuzzle }}">
+            <div class="gn-scroll" style="width:100%;height:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px">
+              <div style="display:flex;flex-direction:column;gap:8px;width:min(560px,100%)">
+                <sc-for list="{{ connSolved }}" as="g" hint-placeholder-count="0">
+                  <div style="background:{{ g.color }};border-radius:10px;padding:9px 12px;text-align:center">
+                    <div style="font:800 12px 'Poppins';color:#1a0b2e;text-transform:uppercase;letter-spacing:.08em">{{ g.name }}</div>
+                    <div style="font:700 12px 'Poppins';color:#1a0b2e">{{ g.wordsLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(560px,100%)">
+                <sc-for list="{{ connTiles }}" as="t" hint-placeholder-count="16">
+                  <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.word }}</div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font:700 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#8f74c4">Mistakes left</span>
+                <div style="display:flex;gap:5px">
+                  <sc-for list="{{ connHearts }}" as="h" hint-placeholder-count="4">
+                    <i class="ti {{ h.icon }}" style="font-size:17px;color:{{ h.color }}"></i>
+                  </sc-for>
+                </div>
+              </div>
+              <sc-if value="{{ connMsg }}"><div style="font:700 13px 'Poppins';color:#fff2cf">{{ connMsg }}</div></sc-if>
+              <div style="display:flex;gap:10px">
+                <button onClick="{{ connShuffle }}" style="background:transparent;border:1px solid rgba(192,132,252,.4);color:#E9D5FF;font:700 12px 'Poppins';border-radius:999px;padding:10px 18px;cursor:pointer">Shuffle</button>
+                <button onClick="{{ connDeselect }}" style="background:transparent;border:1px solid rgba(192,132,252,.4);color:#E9D5FF;font:700 12px 'Poppins';border-radius:999px;padding:10px 18px;cursor:pointer">Deselect</button>
+                <button onClick="{{ connSubmit }}" disabled="{{ connSubmitDisabled }}" style="background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 12px 'Poppins';border:none;border-radius:999px;padding:10px 22px;cursor:pointer">Submit</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showWordle }}">
+            <div class="gn-scroll" style="width:100%;height:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ wordleRows }}" as="row" hint-placeholder-count="6">
+                  <div style="display:flex;gap:6px">
+                    <sc-for list="{{ row.tiles }}" as="c" hint-placeholder-count="5">
+                      <div style="{{ c.style }}">{{ c.ch }}</div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ wordleMsg }}"><div style="font:700 13px 'Poppins';color:#fff2cf">{{ wordleMsg }}</div></sc-if>
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+                <sc-for list="{{ wordleKeyRows }}" as="kr" hint-placeholder-count="3">
+                  <div style="display:flex;gap:5px">
+                    <sc-for list="{{ kr.keys }}" as="k" hint-placeholder-count="9">
+                      <div onClick="{{ k.onClick }}" style="{{ k.style }}">{{ k.label }}</div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showBee }}">
+            <div class="gn-scroll" style="width:100%;height:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px">
+              <sc-if value="{{ beeNoWord }}"><div style="font:700 12px 'Poppins';color:#fff2cf;text-align:center">Host: add a 7-letter word &amp; center letter in Setup → Content</div></sc-if>
+              <div style="min-height:38px;display:flex;align-items:center;justify-content:center;font:400 32px 'Anton';letter-spacing:.12em;color:#F3E8FF">{{ beeInput }}</div>
+              <div style="position:relative;width:260px;height:260px">
+                <div onClick="{{ beeCenterClick }}" style="position:absolute;left:84px;top:90px;width:92px;height:80px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font:400 30px 'Anton';cursor:pointer;background:#F4C95D;color:#1a0b2e;user-select:none">{{ beeCenter }}</div>
+                <sc-for list="{{ beeHexes }}" as="h" hint-placeholder-count="6">
+                  <div onClick="{{ h.onClick }}" style="{{ h.style }}">{{ h.letter }}</div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ beeMsg }}"><div style="font:700 13px 'Poppins';color:#fff2cf">{{ beeMsg }}</div></sc-if>
+              <div style="display:flex;gap:10px">
+                <button onClick="{{ beeDelete }}" style="background:transparent;border:1px solid rgba(192,132,252,.4);color:#E9D5FF;font:700 12px 'Poppins';border-radius:999px;padding:10px 18px;cursor:pointer">Delete</button>
+                <button onClick="{{ beeShuffle }}" style="background:transparent;border:1px solid rgba(192,132,252,.4);color:#E9D5FF;font:700 12px 'Poppins';border-radius:999px;padding:10px 18px;cursor:pointer">Shuffle</button>
+                <button onClick="{{ beeEnter }}" style="background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 12px 'Poppins';border:none;border-radius:999px;padding:10px 22px;cursor:pointer">Enter</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font:700 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#8f74c4">Round score</span>
+                <span style="font:400 26px 'Anton';color:#F4C95D">{{ beeScoreLabel }}</span>
+                <span style="font:600 10px 'Poppins';color:#8f74c4">{{ beeFoundCount }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;max-width:440px;justify-content:center">
+                <sc-for list="{{ beeFound }}" as="f" hint-placeholder-count="0">
+                  <div style="background:#150c30;border:1px solid rgba(192,132,252,.25);border-radius:999px;padding:5px 12px;font:600 11px 'Poppins';color:#E9D5FF;text-transform:uppercase">{{ f.word }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <!-- answer reveal (image kind only) -->
+        <div style="flex:none;margin-top:12px;display:flex;align-items:center;justify-content:center;min-height:52px">
+          <sc-if value="{{ showBottomControls }}">
+            <sc-if value="{{ revealed }}"><div style="display:flex;align-items:center;gap:12px;background:rgba(244,201,93,.12);border:1px solid #F4C95D;border-radius:12px;padding:11px 22px;animation:fadeup .4s ease-out"><span style="font:700 10px 'Poppins';letter-spacing:.14em;color:#e0b34a;text-transform:uppercase">Answer</span><span style="font:400 24px 'Anton';color:#F4C95D">{{ curAnswer }}</span></div></sc-if>
+            <sc-if value="{{ notRevealed }}"><button onClick="{{ reveal }}" style="display:flex;align-items:center;gap:9px;background:#7C3AED;color:#fff;font:700 13px 'Poppins';border:none;border-radius:12px;padding:12px 26px;cursor:pointer;box-shadow:0 0 20px rgba(124,58,237,.5)"><i class="ti ti-eye" style="font-size:16px"></i>Reveal answer</button></sc-if>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- host rail -->
+      <div style="width:150px;flex:none;display:flex;flex-direction:column;gap:9px">
+        <div style="font:700 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#8f74c4">Host controls</div>
+        <button onClick="{{ playToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#150c30;border:1px solid rgba(192,132,252,.3);border-radius:11px;padding:11px;color:#E9D5FF;font:700 12px 'Poppins';cursor:pointer"><i class="ti {{ playIcon }}" style="font-size:16px;color:#C084FC"></i>{{ playLabel }}</button>
+        <button onClick="{{ backToBoard }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;border:none;border-radius:11px;padding:11px;font:800 12px 'Poppins';cursor:pointer;box-shadow:0 0 16px rgba(244,201,93,.35)"><i class="ti ti-layout-grid" style="font-size:15px"></i>Back to board</button>
+        <div style="margin-top:auto;background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:8px"><i class="ti ti-volume" style="font-size:15px;color:#F4C95D"></i><div><div style="font:700 9px 'Poppins';color:#F3E8FF">Sound FX on</div><div style="font:500 8px monospace;color:#8f74c4">ding / buzzer</div></div></div>
+        <div style="font:500 8px 'Poppins';color:#6B4FA0;text-align:center;line-height:1.4">Tap a player to award points · ✗ to buzz wrong</div>
+      </div>
+    </div>
+
+    <!-- players -->
+    <div style="position:relative;flex:none;padding:12px 26px 16px;display:flex;gap:8px;flex-wrap:wrap">
+      <sc-for list="{{ playPlayers }}" as="p" hint-placeholder-count="4">
+        <div onClick="{{ p.onAward }}" style="{{ p.cardStyle }}">
+          <div style="width:26px;height:26px;border-radius:7px;background:{{ p.color }};color:#1a0b2e;font:400 12px 'Anton';display:flex;align-items:center;justify-content:center;flex:none">{{ p.initials }}</div>
+          <div style="flex:1;min-width:0"><div style="font:700 11px 'Poppins';color:#F3E8FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div></div>
+          <div style="font:400 19px 'Anton';color:{{ p.scoreColor }};text-shadow:0 0 10px rgba(244,201,93,.35)">{{ p.score }}</div>
+          <i class="ti ti-x" onClick="{{ p.onWrong }}" style="font-size:13px;color:#f0888a;cursor:pointer;padding-left:2px"></i>
+        </div>
+      </sc-for>
+      <button onClick="{{ endGame }}" style="margin-left:auto;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(244,201,93,.4);color:#F4C95D;font:700 11px 'Poppins';border-radius:999px;padding:8px 16px;cursor:pointer"><i class="ti ti-trophy" style="font-size:14px"></i>Standings</button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== LEADERBOARD ===================== -->
+<sc-if value="{{ isLeaderboard }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;padding-top:26px">
+    <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.06) 50%,transparent 58%);animation:sweep 7s ease-in-out infinite;pointer-events:none"></div>
+    <sc-for list="{{ confetti }}" as="c" hint-placeholder-count="0">
+      <div style="{{ c.style }}"></div>
+    </sc-for>
+    <div style="position:relative;text-align:center">
+      <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">{{ boardSub }}</div>
+      <div style="font:400 clamp(40px,6vw,64px) 'Anton';letter-spacing:.03em;background:linear-gradient(90deg,#e0a83a,#fff2cf,#e0a83a);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 3.5s linear infinite;text-shadow:0 0 40px rgba(244,201,93,.3)">LEADERBOARD</div>
+      <sc-if value="{{ showCongrats }}">
+        <div style="display:inline-flex;align-items:center;gap:9px;margin-top:10px;background:rgba(244,201,93,.12);border:1px solid rgba(244,201,93,.4);border-radius:999px;padding:8px 20px"><i class="ti ti-confetti" style="font-size:16px;color:#F4C95D"></i><span style="font:700 13px 'Poppins';color:#fff2cf">{{ congratsText }}</span></div>
+      </sc-if>
+    </div>
+
+    <!-- podium -->
+    <div style="position:relative;display:flex;align-items:flex-end;gap:20px;margin-top:26px">
+      <sc-if value="{{ hasSecond }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:50%;background:#3a2a5c;border:2px solid #C084FC;color:#E9D5FF;font:400 20px 'Anton';display:flex;align-items:center;justify-content:center">{{ p2.initials }}</div><div style="font:700 12px 'Poppins';color:#E9D5FF">{{ p2.name }}</div><div style="width:104px;height:110px;background:linear-gradient(180deg,#2a1a4d,#1a1030);border:1px solid rgba(192,132,252,.3);border-radius:11px 11px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform-origin:bottom;animation:rise .7s ease-out .1s both"><div style="font:400 34px 'Anton';color:#C084FC">{{ p2.score }}</div><div style="font:400 18px 'Anton';color:#8f74c4">2</div></div></div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><i class="ti ti-crown" style="font-size:30px;color:#F4C95D;animation:floaty 2.4s ease-in-out infinite"></i><div style="width:70px;height:70px;border-radius:50%;background:#F4C95D;border:3px solid #fff2cf;color:#1a0b2e;font:400 26px 'Anton';display:flex;align-items:center;justify-content:center;box-shadow:0 0 34px rgba(244,201,93,.6)">{{ p1.initials }}</div><div style="font:700 14px 'Poppins';color:#F4C95D">{{ p1.name }}</div><div style="width:124px;height:150px;background:linear-gradient(180deg,#F4C95D,#c99a34);border-radius:11px 11px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform-origin:bottom;animation:rise .7s ease-out both;box-shadow:0 0 40px rgba(244,201,93,.4)"><div style="font:400 52px 'Anton';color:#1a0b2e;line-height:.9">{{ p1.score }}</div><div style="font:400 22px 'Anton';color:#5a3c0c">1</div></div></div>
+      <sc-if value="{{ hasThird }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:50%;background:#3a2a5c;border:2px solid #C084FC;color:#E9D5FF;font:400 20px 'Anton';display:flex;align-items:center;justify-content:center">{{ p3.initials }}</div><div style="font:700 12px 'Poppins';color:#E9D5FF">{{ p3.name }}</div><div style="width:104px;height:84px;background:linear-gradient(180deg,#2a1a4d,#1a1030);border:1px solid rgba(192,132,252,.3);border-radius:11px 11px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform-origin:bottom;animation:rise .7s ease-out .2s both"><div style="font:400 30px 'Anton';color:#C084FC">{{ p3.score }}</div><div style="font:400 18px 'Anton';color:#8f74c4">3</div></div></div>
+      </sc-if>
+    </div>
+
+    <!-- rest -->
+    <div class="gn-scroll" style="position:relative;width:min(560px,90%);margin-top:20px;display:flex;flex-direction:column;gap:7px;overflow-y:auto">
+      <sc-for list="{{ boardRest }}" as="r" hint-placeholder-count="0">
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(21,12,48,.7);border:1px solid rgba(192,132,252,.16);border-radius:11px;padding:8px 14px"><div style="font:400 16px 'Anton';color:#8f74c4;width:22px">{{ r.rank }}</div><div style="width:28px;height:28px;border-radius:8px;background:{{ r.color }};color:#1a0b2e;font:400 12px 'Anton';display:flex;align-items:center;justify-content:center">{{ r.initials }}</div><div style="flex:1;font:700 12px 'Poppins';color:#E9D5FF">{{ r.name }}</div><div style="flex:1;height:9px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden"><div style="height:100%;width:{{ r.pct }};background:linear-gradient(90deg,#5b23c9,#C084FC);border-radius:5px;transform-origin:left;animation:grow .8s ease-out both"></div></div><div style="font:400 18px 'Anton';color:#E9D5FF;width:44px;text-align:right">{{ r.score }}</div></div>
+      </sc-for>
+    </div>
+
+    <div style="position:relative;display:flex;gap:12px;margin-top:22px;padding-bottom:20px">
+      <sc-if value="{{ hasRemaining }}">
+        <button onClick="{{ resumeGame }}" style="display:flex;align-items:center;gap:8px;background:#150c30;border:1px solid rgba(192,132,252,.3);color:#E9D5FF;font:700 12px 'Poppins';border-radius:999px;padding:12px 24px;cursor:pointer"><i class="ti ti-arrow-back-up" style="font-size:15px"></i>Back to game</button>
+      </sc-if>
+      <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 12px 'Poppins';border:none;border-radius:999px;padding:12px 24px;cursor:pointer;box-shadow:0 0 20px rgba(244,201,93,.4)"><i class="ti ti-refresh" style="font-size:15px"></i>New game night</button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== SAVE DIALOG ===================== -->
+<sc-if value="{{ showSaveDialog }}">
+  <div style="position:absolute;inset:0;background:rgba(5,2,14,.75);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#150c30;border:1px solid rgba(244,201,93,.35);border-radius:16px;padding:22px;width:min(360px,90%);box-shadow:0 0 40px rgba(0,0,0,.5)">
+      <div style="font:800 16px 'Poppins';color:#F3E8FF;margin-bottom:4px">Save this game night</div>
+      <div style="font:500 11px 'Poppins';color:#8f74c4;margin-bottom:14px">Categories, content and players are saved. Loading it later jumps straight to the players screen.</div>
+      <input value="{{ saveNameDraft }}" onChange="{{ onSaveNameChange }}" placeholder="Name this game night" style="width:100%;background:#0d0722;border:1px solid rgba(192,132,252,.25);border-radius:8px;color:#F3E8FF;font:600 13px 'Poppins';padding:10px;margin-bottom:14px">
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button onClick="{{ closeSaveDialog }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.3);color:#c9b6ee;font:600 12px 'Poppins';border-radius:999px;padding:9px 18px;cursor:pointer">Cancel</button>
+        <button onClick="{{ confirmSave }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;font:800 12px 'Poppins';border:none;border-radius:999px;padding:9px 18px;cursor:pointer">Save</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+
+
+<!-- rework: connections + wordle mechanics -->
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showHostBadge&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;},&quot;showTagline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;},&quot;showHomeStats&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;}}">
+class Component extends DCLogic {
+  PUNS = { geo:'Where in the World', logo:'Brand Slam', flag:'Flag Day', who:'Face Off', wordle:'Word Up', conn:'Connect the Dots', bee:'To Bee or Not to Bee', rebus:'Read Between the Lines', trivia:'Trivia Pursuit' };
+  CONN_COLORS = ['#F4C95D','#C084FC','#5ED3F0','#8EF0A8'];
+  COLORS = ['#F4C95D','#C084FC','#7C3AED','#5ED3F0','#F0855E','#8EF0A8','#F05EC0','#B8F05E'];
+
+  buildCats() {
+    const defs = [
+      { id:'geo', name:'Geoguessr', icon:'ti-world', tag:'GEO', kind:'image', questions:5, timer:30, points:10, on:true },
+      { id:'logo', name:'Guess the Logo', icon:'ti-building-store', tag:'LOGO', kind:'image', questions:8, timer:15, points:10, on:true },
+      { id:'flag', name:'Guess the Flag', icon:'ti-flag', tag:'FLAG', kind:'image', questions:8, timer:15, points:10, on:false },
+      { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'image', questions:6, timer:20, points:10, on:false },
+      { id:'wordle', name:'Wordle', icon:'ti-square-letter-w', tag:'WORD', kind:'wordle', questions:3, timer:60, points:5, on:false },
+      { id:'conn', name:'Connections', icon:'ti-grid-dots', tag:'CONN', kind:'grid', questions:2, timer:180, points:8, on:true },
+      { id:'bee', name:'Spelling Bee', icon:'ti-hexagon', tag:'BEE', kind:'bee', questions:3, timer:90, points:5, on:false },
+      { id:'rebus', name:'Rebus Puzzles', icon:'ti-puzzle', tag:'REBUS', kind:'image', questions:6, timer:20, points:8, on:false },
+      { id:'trivia', name:'Trivia', icon:'ti-bulb', tag:'TRIV', kind:'trivia', questions:10, timer:20, points:5, on:true },
+    ];
+    return defs.map(d => ({ ...d, items: this.mkItems(d.kind, d.questions) }));
+  }
+  mkItems(kind, n) {
+    if (kind==='trivia') return Array.from({ length:n }, () => ({ prompt:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), points:10 }));
+    if (kind==='grid') return Array.from({ length:n }, () => ({ groups:[0,1,2,3].map(()=>({ name:'', words:['','','',''] })), points:8 }));
+    if (kind==='wordle') return Array.from({ length:n }, () => ({ word:'', points:5 }));
+    if (kind==='bee') return Array.from({ length:n }, () => ({ word:'', center:'', points:0 }));
+    return Array.from({ length:n }, () => ({ image:null, answer:'', points:10 }));
+  }
+  buildPlayers() {
+    const C = this.COLORS;
+    return [['Vikram','V'],['Riya','R'],['Sam','S'],['Jai','J']].map((p,i)=>({ id:'p'+i+'_'+Date.now(), name:p[0], score:0, color:C[i%C.length] }));
+  }
+  state = {
+    screen:'home', step:1, useTeams:false,
+    cats:this.buildCats(), players:this.buildPlayers(),
+    contentId:'geo',
+    curCatId:null, curQIdx:0, timeLeft:0, running:false, revealed:false, lastResult:0, flash:null,
+    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null,
+    saves:[], showSaveDialog:false, saveNameDraft:'',
+  };
+
+  componentDidMount(){ this.setState({ saves:this.loadSavesFromStorage() }); this._kd=(e)=>this.onKeyDown(e); window.addEventListener('keydown', this._kd); }
+  componentWillUnmount(){ this.stopTimer(); if(this._kd) window.removeEventListener('keydown', this._kd); }
+  onKeyDown(e){ const s=this.state; if(s.screen!=='play') return; const cat=this.curCat(); if(!cat) return; const t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')) return;
+    if(cat.kind==='wordle'){ if(e.key==='Enter'){ e.preventDefault(); this.wordleEnter(); } else if(e.key==='Backspace'){ e.preventDefault(); this.wordleBackspace(); } else if(/^[a-zA-Z]$/.test(e.key)){ this.wordleType(e.key.toUpperCase()); } return; }
+    if(cat.kind==='bee'){ if(e.key==='Enter'){ e.preventDefault(); this.beeEnter(); } else if(e.key==='Backspace'){ e.preventDefault(); this.beeDelete(); } else if(/^[a-zA-Z]$/.test(e.key)){ this.beeType(e.key.toUpperCase()); } return; } }
+
+  // ---- saves ----
+  loadSavesFromStorage(){ try{ return JSON.parse(localStorage.getItem('ultimateGamenightSaves')||'[]'); }catch(e){ return []; } }
+  persistSaves(list){ try{ localStorage.setItem('ultimateGamenightSaves', JSON.stringify(list)); }catch(e){} this.setState({ saves:list }); }
+  openSaveDialog(){ this.setState({ showSaveDialog:true, saveNameDraft:'Game Night — '+new Date().toLocaleDateString() }); }
+  closeSaveDialog(){ this.setState({ showSaveDialog:false }); }
+  onSaveNameChange(ev){ this.setState({ saveNameDraft:ev.target.value }); }
+  confirmSave(){
+    const list = this.loadSavesFromStorage();
+    const entry = { id:'save_'+Date.now(), name:this.state.saveNameDraft||'Untitled game night', savedAt:Date.now(), cats:this.state.cats, players:this.state.players, useTeams:this.state.useTeams };
+    list.unshift(entry);
+    this.persistSaves(list);
+    this.setState({ showSaveDialog:false });
+  }
+  deleteSave(id){ this.persistSaves(this.loadSavesFromStorage().filter(sv=>sv.id!==id)); }
+  loadSave(sv){ this.setState({ cats: sv.cats.map(c=>({...c})), players: sv.players.map(p=>({...p,score:0})), useTeams: !!sv.useTeams, screen:'setup', step:3 }); }
+  goSaved(){ this.setState({ screen:'saved', saves:this.loadSavesFromStorage() }); }
+
+  // ---- audio ----
+  ac(){ if(!this._ac){ try{ this._ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(this._ac && this._ac.state==='suspended') this._ac.resume(); return this._ac; }
+  playRight(){ const c=this.ac(); if(!c)return; const t=c.currentTime; [660,880,1320].forEach((f,i)=>{ const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f; const s=t+i*0.11; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.32,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.2); o.connect(g).connect(c.destination); o.start(s); o.stop(s+0.22); }); }
+  playWrong(){ const c=this.ac(); if(!c)return; const t=c.currentTime; const o=c.createOscillator(),g=c.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(70,t+0.5); g.gain.setValueAtTime(0.28,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.55); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.56); }
+
+  // ---- timer ----
+  stopTimer(){ if(this._iv){ clearInterval(this._iv); this._iv=null; } }
+  startTimer(){ this.stopTimer(); if(this.state.timeLeft<=0) return; this.setState({running:true}); this._iv=setInterval(()=>{ this.setState(s=>{ if(s.timeLeft<=1){ this.stopTimer(); this.playWrong(); return {timeLeft:0,running:false}; } return {timeLeft:s.timeLeft-1}; }); },1000); }
+  playToggle(){ if(this.state.running) { this.stopTimer(); this.setState({running:false}); } else { this.startTimer(); } }
+
+  // ---- setup helpers ----
+  activeCats(){ return this.state.cats.filter(c=>c.on); }
+  patchCat(id, fn){ this.setState(s=>({ cats:s.cats.map(c=> c.id===id? fn({...c}) : c) })); }
+  toggleCat(id){ this.patchCat(id, c=>{ c.on=!c.on; return c; }); }
+  stepQ(id, d){ this.patchCat(id, c=>{ c.questions=Math.max(1,Math.min(40,c.questions+d)); const it=c.items.slice(0,c.questions); while(it.length<c.questions) it.push(this.mkItems(c.kind,1)[0]); c.items=it; return c; }); }
+  stepT(id, d){ this.patchCat(id, c=>{ const opts=[5,8,10,15,20,30,45,60,90,120,180,300]; let i=opts.indexOf(c.timer); if(i<0){ c.timer=Math.max(5,c.timer+d*5); return c; } i=Math.max(0,Math.min(opts.length-1,i+d)); c.timer=opts[i]; return c; }); }
+  stepP(id, d){ this.patchCat(id, c=>{ c.points=Math.max(1,Math.min(50,c.points+d)); return c; }); }
+  fmt(t){ const m=Math.floor(t/60), s=t%60; return m>0 ? m+':'+String(s).padStart(2,'0') : s+'s'; }
+
+  // ---- content ----
+  patchItem(catId, idx, fn){ this.setState(s=>({ cats:s.cats.map(c=>{ if(c.id!==catId) return c; const items=c.items.map((it,i)=> i===idx? fn({...it}) : it); return {...c, items}; }) })); }
+  uploadImg(catId, idx, ev){ const f=ev.target && ev.target.files && ev.target.files[0]; if(!f) return; const url=URL.createObjectURL(f); this.patchItem(catId, idx, it=>{ it.image=url; return it; }); }
+  selectContent(id){ this.setState({contentId:id}); }
+
+  // ---- players ----
+  addPlayer(){ const C=this.COLORS; this.setState(s=>{ const n=s.players.length; return { players:[...s.players, {id:'p'+n+'_'+Date.now(), name:(s.useTeams?'Team ':'Player ')+(n+1), score:0, color:C[n%C.length]}] }; }); }
+  removePlayer(id){ this.setState(s=> s.players.length>1 ? { players:s.players.filter(p=>p.id!==id) } : {} ); }
+  renamePlayer(id, ev){ const v=ev.target.value; this.setState(s=>({ players:s.players.map(p=>p.id===id?{...p,name:v}:p) })); }
+  setPlayerColor(id, color){ this.setState(s=>({ players:s.players.map(p=>p.id===id?{...p,color}:p) })); }
+  toggleTeams(){ this.setState(s=>({ useTeams:!s.useTeams })); }
+
+  // ---- wizard nav ----
+  goHome(){ this.stopTimer(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:0})) }); }
+  goSetup(){ this.ac(); this.setState({ screen:'setup', step:1 }); }
+  nextStep(){ const st=this.state.step; if(st<3){ let ns=st+1; if(ns===2 && !this.activeCats().some(c=>c.id===this.state.contentId)) { const a=this.activeCats(); if(a[0]) this.setState({contentId:a[0].id}); } this.setState({step:ns}); } else { this.startGame(); } }
+  prevStep(){ const st=this.state.step; if(st>1) this.setState({step:st-1}); else this.goHome(); }
+
+  // ---- play ----
+  startGame(){ this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:0})) }); }
+  curCat(){ return this.state.cats.find(c=>c.id===this.state.curCatId); }
+  curItem(){ const c=this.curCat(); return c ? c.items[this.state.curQIdx] : null; }
+  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null }); }
+  backToBoard(){
+    const cat=this.curCat();
+    this.stopTimer();
+    this.setState(s=>{
+      const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
+      const pickerIdx = s.players.length ? (s.pickerIdx+1)%s.players.length : 0;
+      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null };
+    });
+  }
+  reveal(){
+    const cat=this.curCat();
+    this.stopTimer();
+    if(cat && cat.kind==='grid'){ this.setState({ showConnAnswer:true, running:false }); }
+    else { this.setState({ revealed:true, running:false }); }
+  }
+  backToPuzzle(){ this.setState({ showConnAnswer:false }); }
+
+  // ---- connections mechanic ----
+  shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  initConn(item){ const tiles=[]; ((item&&item.groups)||[]).forEach((g,gi)=> (g.words||['','','','']).forEach(w=> tiles.push({ word:(w||'').trim(), g:gi }))); while(tiles.length<16) tiles.push({ word:'', g:Math.floor(tiles.length/4) }); const order=this.shuffle([...Array(16).keys()]); return { tiles, order, selected:[], solvedGroups:[], mistakes:4, done:false, revealAll:false, msg:'' }; }
+  connToggle(i){ this.setState(s=>{ const cn=s.conn; if(!cn||cn.done) return {}; if(cn.solvedGroups.includes(cn.tiles[i].g)) return {}; let sel=cn.selected.slice(); if(sel.includes(i)) sel=sel.filter(x=>x!==i); else if(sel.length<4) sel=[...sel,i]; return { conn:{...cn, selected:sel, msg:''} }; }); }
+  connDeselect(){ this.setState(s=> s.conn?{ conn:{...s.conn, selected:[]} }:{}); }
+  connShuffle(){ this.setState(s=>{ if(!s.conn) return {}; return { conn:{...s.conn, order:this.shuffle(s.conn.order.slice())} }; }); }
+  connSubmit(){ this.setState(s=>{ const cn=s.conn; if(!cn||cn.done||cn.selected.length!==4) return {}; const gs=cn.selected.map(i=>cn.tiles[i].g); const allSame=gs.every(g=>g===gs[0]); if(allSame){ const grp=gs[0]; const solvedGroups=[...cn.solvedGroups,grp]; const done=solvedGroups.length===4; if(done) this.playRight(); return { conn:{...cn, solvedGroups, selected:[], done, msg: done?'Solved the whole board! 🎉':'Group found — nice!'} }; } else { const mistakes=cn.mistakes-1; const lose=mistakes<=0; if(lose) this.playWrong(); return { conn:{...cn, mistakes:Math.max(0,mistakes), selected:[], done:lose, revealAll:lose, msg: lose?'Out of guesses — groups revealed':'Not a group — try again'} }; } }); }
+
+  // ---- wordle mechanic ----
+  wordleTarget(){ const it=this.curItem(); return (it&&it.word?it.word:'').toUpperCase().replace(/[^A-Z]/g,''); }
+  wordleType(ch){ this.setState(s=>{ if(!s.wordle||s.wordle.done) return {}; const t=this.wordleTarget(); if(!t) return {}; if(s.wordle.current.length>=t.length) return {}; return { wordle:{...s.wordle, current:s.wordle.current+ch, msg:''} }; }); }
+  wordleBackspace(){ this.setState(s=>{ if(!s.wordle||s.wordle.done) return {}; return { wordle:{...s.wordle, current:s.wordle.current.slice(0,-1), msg:''} }; }); }
+  wordleEnter(){ this.setState(s=>{ if(!s.wordle||s.wordle.done) return {}; const t=this.wordleTarget(); if(!t) return {}; const cur=s.wordle.current; if(cur.length!==t.length) return { wordle:{...s.wordle, msg:'Not enough letters'} }; const guesses=[...s.wordle.guesses,cur]; let done=false,win=false,msg=''; if(cur===t){ done=true; win=true; msg='Correct! 🎉'; this.playRight(); } else if(guesses.length>=6){ done=true; msg='Out of tries — the word was '+t; this.playWrong(); } return { wordle:{...s.wordle, guesses, current:'', done, win, msg} }; }); }
+  evalGuess(guess,target){ const L=target.length; const res=Array(L).fill('absent'); const tarr=target.split(''); const used=Array(L).fill(false); for(let i=0;i<L;i++){ if(guess[i]===tarr[i]){ res[i]='correct'; used[i]=true; } } for(let i=0;i<L;i++){ if(res[i]==='correct') continue; const ch=guess[i]; let f=-1; for(let j=0;j<L;j++){ if(!used[j]&&tarr[j]===ch){ f=j; break; } } if(f>=0){ res[i]='present'; used[f]=true; } } return res; }
+  wtile(st){ const base='width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:8px;font:400 26px Anton;text-transform:uppercase;'; if(st==='correct') return base+'background:#8EF0A8;color:#0a2818;border:2px solid #8EF0A8'; if(st==='present') return base+'background:#F0855E;color:#2a0f06;border:2px solid #F0855E'; if(st==='absent') return base+'background:#241832;color:#6B4FA0;border:2px solid #241832'; if(st==='filled') return base+'background:#150c30;color:#F3E8FF;border:2px solid #7C3AED'; return base+'background:#0d0722;color:#F3E8FF;border:2px solid rgba(192,132,252,.25)'; }
+  wkey(isAct,st){ const base='min-width:'+(isAct?'48px':'30px')+';height:46px;padding:0 9px;display:flex;align-items:center;justify-content:center;border-radius:7px;font:700 '+(isAct?'15px':'15px')+' Poppins;cursor:pointer;user-select:none;'; if(st==='correct') return base+'background:#8EF0A8;color:#0a2818'; if(st==='present') return base+'background:#F0855E;color:#2a0f06'; if(st==='absent') return base+'background:#241832;color:#5a4a80'; return base+'background:#2a1a4d;color:#E9D5FF'; }
+  flashFx(kind){ this.setState({flash:kind, lastResult:Date.now()}); clearTimeout(this._ft); this._ft=setTimeout(()=>{ this.setState({flash:null}); },800); }
+  award(pid){ const cat=this.curCat(); const item=this.curItem(); let pts; if(cat && cat.kind==='bee'){ pts=this.state.bee?this.state.bee.score:0; } else { pts=(item && item.points!=null)?item.points:(cat?cat.points:0); } this.playRight(); this.flashFx('right'); this.setState(s=>({ players:s.players.map(p=>p.id===pid?{...p,score:p.score+pts}:p) })); }
+  wrong(pid, ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); this.playWrong(); this.flashFx('wrong'); }
+  endGame(){ this.stopTimer(); this.setState({screen:'leaderboard'}); }
+  resumeGame(){ this.setState({screen:'board'}); }
+  goToPlayers(){ this.stopTimer(); this.setState({ screen:'setup', step:3 }); }
+
+  // ---- spelling bee mechanic ----
+  initBee(item){ const word=(item&&item.word?item.word:'').toUpperCase().replace(/[^A-Z]/g,''); const center=(item&&item.center?item.center:'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,1); const uniq=[...new Set(word.split(''))]; const outer=this.shuffle(uniq.filter(l=>l!==center)); return { input:'', found:[], score:0, outer, center, allowed:new Set(uniq), msg:'' }; }
+  beeType(l){ if(!l) return; const b=this.state.bee; if(!b) return; if(b.input.length>=20) return; this.setState({ bee:{...b, input:b.input+l, msg:''} }); }
+  beeDelete(){ const b=this.state.bee; if(!b) return; this.setState({ bee:{...b, input:b.input.slice(0,-1), msg:''} }); }
+  beeShuffle(){ const b=this.state.bee; if(!b) return; this.setState({ bee:{...b, outer:this.shuffle(b.outer.slice())} }); }
+  beeScore(len,isPan){ if(isPan) return 10; if(len>7) return 3; if(len>5) return 2; return 1; }
+  beeEnter(){ const b=this.state.bee; if(!b) return; const w=b.input; let err=null; if(w.length<4) err='Too short — 4 letters minimum'; else if(!b.center) err='Host: set a center letter first'; else if(!w.includes(b.center)) err='Must use the center letter '+b.center; else if([...w].some(ch=>!b.allowed.has(ch))) err='Uses a letter not in the hive'; else if(b.found.includes(w)) err='Already found that one'; if(err){ this.playWrong(); this.flashFx('wrong'); this.setState({ bee:{...b, msg:err} }); return; } const isPan=b.allowed.size>0 && [...b.allowed].every(l=>w.includes(l)); const pts=this.beeScore(w.length,isPan); this.playRight(); this.flashFx('right'); this.setState({ bee:{...b, found:[w,...b.found], score:b.score+pts, input:'', msg:(isPan?('PANGRAM! +'+pts):('+'+pts+(pts>1?' points':' point'))) } }); }
+  pickTrivia(i){ const item=this.curItem(); if(!item||!item.options) return; const correct=!!(item.options[i]&&item.options[i].correct); if(correct){ this.playRight(); this.flashFx('right'); } else { this.playWrong(); this.flashFx('wrong'); } this.setState({ triviaPick:i, revealed:true }); }
+
+  // ---------- RENDER ----------
+  pill(active){ return active
+    ? 'font:700 10px Poppins;letter-spacing:.02em;color:#1a0b2e;background:#F4C95D;padding:6px 12px;border-radius:999px;box-shadow:0 0 12px rgba(244,201,93,.45)'
+    : 'font:600 10px Poppins;color:#8f74c4;background:#150c30;padding:6px 12px;border-radius:999px'; }
+
+  renderVals(){
+    const s = this.state;
+    const isSetup = s.screen==='setup';
+    const active = this.activeCats();
+    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : 'image';
+
+    // setup step 1 cats
+    const setupCats = s.cats.map(c=>{
+      const on=c.on;
+      return {
+        ...c,
+        kindLabel: kindLabelOf(c.kind),
+        timerLabel: this.fmt(c.timer),
+        nameColor: on ? '#F3E8FF' : '#b9a3e0',
+        iconStyle: 'font-size:20px;color:'+(on?'#F4C95D':'#6B4FA0'),
+        cardStyle: on
+          ? 'background:linear-gradient(160deg,rgba(244,201,93,.16),#150c30);border:1.5px solid #F4C95D;border-radius:14px;padding:13px;box-shadow:0 0 18px rgba(244,201,93,.22),inset 0 0 0 1px rgba(244,201,93,.08)'
+          : 'background:#120b28;border:1px solid rgba(192,132,252,.14);border-radius:14px;padding:13px;opacity:.62',
+        switchStyle: 'width:40px;height:22px;border-radius:999px;padding:2px;cursor:pointer;transition:.2s;background:'+(on?'#F4C95D':'#3a2a5c'),
+        knobStyle: 'width:18px;height:18px;border-radius:50%;background:'+(on?'#1a0b2e':'#c9b6ee')+';transition:.2s;transform:translateX('+(on?'18px':'0')+')',
+        onToggle: ()=>this.toggleCat(c.id),
+        qInc:()=>this.stepQ(c.id,1), qDec:()=>this.stepQ(c.id,-1),
+        tInc:()=>this.stepT(c.id,1), tDec:()=>this.stepT(c.id,-1),
+        pInc:()=>this.stepP(c.id,1), pDec:()=>this.stepP(c.id,-1),
+      };
+    });
+
+    // content rail
+    const railSel = s.contentId;
+    const contentRail = active.map(c=>{
+      const filled = c.items.filter(it=> c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? (!!it.word && it.word.length===7 && !!it.center && it.word.includes(it.center)) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
+      const done = filled>=c.questions && c.questions>0;
+      const sel = c.id===railSel;
+      return { ...c, sel,
+        iconColor: sel?'#F4C95D':'#C084FC',
+        nameColor: sel?'#fff2cf':'#E9D5FF',
+        fillLabel: filled+' / '+c.questions+' ready',
+        checkIcon: done?'ti-circle-check-filled':'ti-circle',
+        checkColor: done?'#8EF0A8':'#3a2a5c',
+        railStyle:'display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;margin-bottom:4px;'+(sel?'background:rgba(244,201,93,.12);border:1px solid rgba(244,201,93,.4)':'background:transparent;border:1px solid transparent'),
+        onSelect:()=>this.selectContent(c.id),
+      };
+    });
+    const selCat = s.cats.find(c=>c.id===railSel) || active[0] || s.cats[0];
+    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter a 7-letter word (the pangram) and the center letter every answer must include. Players form words of 4+ letters from these letters.' : 'Drop in one image per question and type the correct answer.') : '';
+
+    const contentItems = selCat ? selCat.items.map((it,idx)=>{
+      const isImageKind = selCat.kind==='image';
+      const isTriviaKind = selCat.kind==='trivia';
+      const isGridKind = selCat.kind==='grid';
+      const isWordleKind = selCat.kind==='wordle';
+      const isBeeKind = selCat.kind==='bee';
+      const stepItemP=(d)=>this.patchItem(selCat.id, idx, x=>{ x.points=Math.max(0,Math.min(100,(x.points!=null?x.points:0)+d)); return x; });
+      const base = { num:idx+1, isImageKind, isTriviaKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind };
+      if(isImageKind){
+        const hasImage = !!it.image;
+        return { ...base, hasImage, noImage: !it.image, answer:it.answer,
+          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:cover;background-position:center;background-image:url('+JSON.stringify(it.image||'')+')',
+          dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
+          onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
+          onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
+        };
+      }
+      if(isTriviaKind){
+        const options = it.options.map((o,oi)=>({
+          text:o.text, correct:o.correct,
+          rowStyle:'display:flex;align-items:center;gap:6px;background:#0d0722;border:1px solid '+(o.correct?'rgba(244,201,93,.5)':'rgba(192,132,252,.2)')+';border-radius:8px;padding:6px 8px',
+          dotStyle:'width:14px;height:14px;border-radius:50%;flex:none;cursor:pointer;border:2px solid '+(o.correct?'#F4C95D':'#5a4a80')+';background:'+(o.correct?'#F4C95D':'transparent'),
+          onMark:()=>this.patchItem(selCat.id, idx, x=>{ x.options=x.options.map((oo,i)=>({...oo,correct:i===oi})); return x; }),
+          onText:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.options=x.options.map((oo,i)=> i===oi?{...oo,text:ev.target.value}:oo); return x; }),
+        }));
+        return { ...base, prompt:it.prompt, options,
+          onPrompt:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.prompt=ev.target.value; return x; }),
+        };
+      }
+      if(isWordleKind){
+        return { ...base, word:it.word||'',
+          onWord:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.word=ev.target.value.toUpperCase().replace(/[^A-Z]/g,''); return x; }),
+        };
+      }
+      if(isBeeKind){
+        return { ...base, word:it.word||'', center:it.center||'',
+          onWord:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.word=ev.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,7); return x; }),
+          onCenter:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.center=ev.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,1); return x; }),
+        };
+      }
+      // connections grid
+      const groups = (it.groups||[]).map((g,gi)=>({
+        name:g.name, color:this.CONN_COLORS[gi],
+        onName:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.groups=x.groups.map((gg,i)=> i===gi?{...gg,name:ev.target.value}:gg); return x; }),
+        words:(g.words||['','','','']).map((w,wi)=>({ value:w,
+          onChange:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.groups=x.groups.map((gg,i)=>{ if(i!==gi) return gg; const words=[...gg.words]; words[wi]=ev.target.value; return {...gg,words}; }); return x; }),
+        })),
+      }));
+      return { ...base, groups };
+    }) : [];
+
+    // players
+    const noun = s.useTeams ? 'team' : 'player';
+    const players = s.players.map(p=>({ ...p, initials:this.ini(p.name), onName:(ev)=>this.renamePlayer(p.id,ev), onRemove:()=>this.removePlayer(p.id),
+      swatches: this.COLORS.map(col=>({ color:col, selected: col===p.color, dotStyle:'width:16px;height:16px;border-radius:50%;background:'+col+';cursor:pointer;border:2px solid '+(col===p.color?'#fff2cf':'transparent')+';box-shadow:'+(col===p.color?'0 0 8px '+col:'none'), onClick:()=>this.setPlayerColor(p.id,col) })) }));
+
+    // step meta
+    const stepHints = { 1:(active.length+' rounds · '+active.reduce((a,c)=>a+c.questions,0)+' questions'), 2:'Upload or type — you can leave blanks and fill live', 3:(s.players.length+' '+noun+(s.players.length>1?'s':'')+' ready') };
+    const nextLabel = s.step<3 ? 'Next' : 'Start show';
+    const nextIcon = s.step<3 ? 'ti-arrow-right' : 'ti-player-play-filled';
+
+    // saved list
+    const savedList = (s.saves||[]).map(sv=>({ id:sv.id, name:sv.name, dateLabel:new Date(sv.savedAt).toLocaleDateString(), catCount:(sv.cats||[]).filter(c=>c.on).length, onLoad:()=>this.loadSave(sv), onDelete:()=>this.deleteSave(sv.id) }));
+
+    // board
+    const totalQuestions = active.reduce((a,c)=>a+c.questions,0);
+    const answeredCount = Object.keys(s.answered).length;
+    const isFinal = totalQuestions>0 && answeredCount>=totalQuestions;
+    const pickerName = s.players.length ? (s.players[s.pickerIdx % s.players.length] || s.players[0]).name : '—';
+    const boardCats = active.map(bc=>{
+      const remaining = bc.questions - bc.items.reduce((a,_,i)=> a + (s.answered[bc.id+'_'+i]?1:0), 0);
+      const qButtons = Array.from({length:bc.questions},(_,i)=>{
+        const done = !!s.answered[bc.id+'_'+i];
+        return { label:String(i+1), disabled:done,
+          onClick: done ? (()=>{}) : (()=>this.pickQuestion(bc.id,i)),
+          style: done
+            ? 'width:52px;height:52px;border-radius:10px;background:#150c30;border:1px solid rgba(192,132,252,.12);color:#4a3a70;font:700 15px Poppins;cursor:not-allowed;pointer-events:none'
+            : 'width:52px;height:52px;border-radius:10px;background:linear-gradient(160deg,#221541,#150c30);border:1.5px solid #F4C95D;color:#F4C95D;font:700 15px Poppins;cursor:pointer;box-shadow:0 0 10px rgba(244,201,93,.15)',
+        };
+      });
+      return { ...bc, punTitle:this.PUNS[bc.id]||bc.name, remaining, qButtons };
+    });
+
+    // play
+    const cat = this.curCat();
+    const item = this.curItem();
+    const total = cat?cat.timer:1;
+    const deg = total>0 ? Math.round((s.timeLeft/total)*360) : 0;
+    const low = s.timeLeft<=5 && s.timeLeft>0;
+    const ringCol = low ? '#f87171' : '#F4C95D';
+    const isImageQ = !!cat && cat.kind==='image';
+    const isTriviaQ = !!cat && cat.kind==='trivia';
+    const isConnQ = !!cat && cat.kind==='grid';
+    const isWordleQ = !!cat && cat.kind==='wordle';
+    const isBeeQ = !!cat && cat.kind==='bee';
+    const curImage = (isImageQ && item) ? item.image : null;
+    const curPrompt = (isTriviaQ && item) ? (item.prompt||'(No question typed yet)') : '';
+    const triviaOptions = (isTriviaQ && item) ? item.options.map((o,i)=>{
+      const picked = s.triviaPick===i;
+      const showGreen = o.correct && (s.revealed || s.triviaPick!=null);
+      const showRed = picked && !o.correct;
+      const b='padding:14px;border-radius:12px;font:700 14px Poppins;text-align:center;cursor:pointer;transition:.15s;';
+      const style = showGreen ? b+'background:rgba(94,240,168,.18);border:2px solid #8EF0A8;color:#8EF0A8'
+        : showRed ? b+'background:rgba(248,113,113,.2);border:2px solid #f87171;color:#f8a3a3'
+        : b+'background:#150c30;border:1px solid rgba(192,132,252,.2);color:#E9D5FF';
+      return { text:o.text||'—', style, onClick:()=>this.pickTrivia(i) };
+    }) : [];
+    // connections play
+    let connTiles=[], connSolved=[], connHearts=[], connMsg='', connSubmitDisabled=true;
+    if(isConnQ && s.conn){
+      const cn=s.conn;
+      const solvedList = cn.revealAll ? [0,1,2,3] : cn.solvedGroups;
+      connSolved = solvedList.map(gi=>{
+        const words = cn.tiles.filter(t=>t.g===gi).map(t=>t.word||'—');
+        const gname = (item && item.groups[gi] && item.groups[gi].name) ? item.groups[gi].name : ('GROUP '+(gi+1));
+        return { name:String(gname).toUpperCase(), color:this.CONN_COLORS[gi], wordsLabel:words.join('  ·  ') };
+      });
+      connTiles = cn.order.filter(i=> !cn.solvedGroups.includes(cn.tiles[i].g)).map(i=>{
+        const sel=cn.selected.includes(i);
+        return { word: cn.tiles[i].word||'—', onClick: cn.done?(()=>{}):(()=>this.connToggle(i)),
+          style:'min-height:58px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:9px;padding:6px 4px;font:700 12px Poppins;text-transform:uppercase;letter-spacing:.02em;line-height:1.1;cursor:'+(cn.done?'default':'pointer')+';'+(sel?'background:#7C3AED;color:#fff;border:1px solid #C084FC':'background:#150c30;color:#E9D5FF;border:1px solid rgba(192,132,252,.25)') };
+      });
+      connHearts = [0,1,2,3].map(i=>({ icon: i<cn.mistakes?'ti-heart-filled':'ti-heart', color: i<cn.mistakes?'#f0888a':'#3a2a5c' }));
+      connMsg = cn.msg||''; connSubmitDisabled = cn.done || cn.selected.length!==4;
+    }
+    // wordle play
+    let wordleRows=[], wordleKeyRows=[], wordleMsg='';
+    if(isWordleQ){
+      const target=(item && item.word? item.word:'').toUpperCase().replace(/[^A-Z]/g,'');
+      const wl=s.wordle||{guesses:[],current:'',done:false};
+      const L=target.length||5;
+      const keyStatus={}; const rank={correct:3,present:2,absent:1};
+      wordleRows = Array.from({length:6},(_,r)=>{
+        let tiles;
+        if(r<wl.guesses.length){
+          const g=wl.guesses[r]; const res=this.evalGuess(g,target);
+          tiles=Array.from({length:L},(_,i)=>{ const st=res[i]; const ch=g[i]||''; if(ch){ const prev=keyStatus[ch]; if(!prev||rank[st]>rank[prev]) keyStatus[ch]=st; } return { ch, style:this.wtile(st) }; });
+        } else if(r===wl.guesses.length && !wl.done){
+          tiles=Array.from({length:L},(_,i)=>({ ch:wl.current[i]||'', style:this.wtile(wl.current[i]?'filled':'empty') }));
+        } else { tiles=Array.from({length:L},(_,i)=>({ ch:'', style:this.wtile('empty') })); }
+        return { tiles };
+      });
+      const krows=[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['\u232b','Z','X','C','V','B','N','M','\u21b5']];
+      wordleKeyRows = krows.map(row=>({ keys: row.map(k=>{ const isAct=(k==='\u232b'||k==='\u21b5'); const st=keyStatus[k]; return { label:k, onClick:()=> k==='\u232b'?this.wordleBackspace(): k==='\u21b5'?this.wordleEnter():this.wordleType(k), style:this.wkey(isAct,st) }; }) }));
+      wordleMsg = target ? (wl.msg||'') : 'Host: add the target word in Setup → Content';
+    }
+    // spelling bee play
+    let beeCenter='', beeHexes=[], beeInput='', beeFound=[], beeScoreVal=0, beeMsg='', beeNoWord=false;
+    if(isBeeQ){
+      const b=s.bee;
+      if(b){
+        beeCenter=b.center||'?'; beeInput=b.input; beeScoreVal=b.score; beeMsg=b.msg||'';
+        beeFound=b.found.map(w=>({ word:w }));
+        beeNoWord = !b.center || b.allowed.size<2;
+        const POS=[[84,8],[155,49],[155,131],[84,172],[13,131],[13,49]];
+        beeHexes=b.outer.map((l,i)=>({ letter:l, onClick:()=>this.beeType(l), style:'position:absolute;left:'+(POS[i]?POS[i][0]:0)+'px;top:'+(POS[i]?POS[i][1]:0)+'px;width:92px;height:80px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);display:flex;align-items:center;justify-content:center;font:400 30px Anton;cursor:pointer;background:#2a1a4d;color:#E9D5FF;user-select:none' }));
+      } else { beeNoWord=true; }
+    }
+    const playPlayers = s.players.map(p=>({ ...p, initials:this.ini(p.name), scoreColor:'#F4C95D',
+      cardStyle:'display:flex;align-items:center;gap:8px;background:rgba(21,12,48,.85);border:1px solid rgba(244,201,93,.3);border-radius:11px;padding:7px 11px;min-width:150px;cursor:pointer;box-shadow:0 0 10px rgba(244,201,93,.08)',
+      onAward:()=>this.award(p.id), onWrong:(ev)=>this.wrong(p.id,ev) }));
+
+    // leaderboard
+    const sorted = [...s.players].sort((a,b)=>b.score-a.score);
+    const max = Math.max(1, ...sorted.map(p=>p.score));
+    const vm = p => p ? { ...p, initials:this.ini(p.name) } : { name:'—', initials:'–', score:0 };
+    const rest = sorted.slice(3).map((p,i)=>({ ...p, initials:this.ini(p.name), rank:i+4, pct: Math.round((p.score/max)*100)+'%' }));
+    const confetti = s.screen==='leaderboard' ? Array.from({length:18},(_,i)=>{ const cols=['#F4C95D','#C084FC','#fff2cf','#7C3AED']; return { style:'position:absolute;top:0;left:'+((i*5.3)%100)+'%;width:'+(4+i%4)+'px;height:'+(7+i%5)+'px;background:'+cols[i%4]+';border-radius:2px;opacity:.85;animation:drift '+(3.4+(i%5)*0.5)+'s linear '+((i%6)*0.35)+'s infinite' }; }) : [];
+
+    return {
+      // screens
+      isHome:s.screen==='home', isSetup, isBoard:s.screen==='board', isPlay:s.screen==='play', isLeaderboard:s.screen==='leaderboard', isSavedList:s.screen==='saved',
+      goHome:()=>this.goHome(), goSetup:()=>this.goSetup(), goSaved:()=>this.goSaved(),
+      showHostBadge: !!this.props.showHostBadge,
+      showTagline: !!this.props.showTagline,
+      showHomeStats: !!this.props.showHomeStats,
+      // saved list
+      hasNoSaves: savedList.length===0, savedList,
+      // setup
+      isStep1:s.step===1, isStep2:s.step===2, isStep3:s.step===3,
+      step1Pill:this.pill(s.step===1), step2Pill:this.pill(s.step===2), step3Pill:this.pill(s.step===3),
+      rulesSummary: active.length+' rounds · '+active.reduce((a,c)=>a+c.questions,0)+' Q',
+      setupCats, contentRail, contentItems, contentIsImage: !!selCat && selCat.kind==='image', contentIsStack: !!selCat && selCat.kind!=='image',
+      selName: selCat?selCat.name:'', selIcon: selCat?selCat.icon:'ti-photo', selHint,
+      players, addPlayer:()=>this.addPlayer(), playerNoun:noun,
+      toggleTeams:()=>this.toggleTeams(),
+      soloColor: s.useTeams?'#8f74c4':'#F3E8FF', teamColor: s.useTeams?'#F3E8FF':'#8f74c4',
+      teamSwitchStyle:'width:34px;height:20px;border-radius:999px;padding:2px;background:'+(s.useTeams?'#F4C95D':'#3a2a5c'),
+      teamKnobStyle:'width:16px;height:16px;border-radius:50%;background:'+(s.useTeams?'#1a0b2e':'#c9b6ee')+';transition:.2s;transform:translateX('+(s.useTeams?'14px':'0')+')',
+      prevStep:()=>this.prevStep(), nextStep:()=>this.nextStep(),
+      backBtnStyle:'display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.3);color:#c9b6ee;font:600 12px Poppins;border-radius:999px;padding:11px 20px;cursor:pointer',
+      stepHint: stepHints[s.step], nextLabel, nextIcon,
+      openSaveDialog:()=>this.openSaveDialog(), closeSaveDialog:()=>this.closeSaveDialog(), confirmSave:()=>this.confirmSave(),
+      onSaveNameChange:(ev)=>this.onSaveNameChange(ev), showSaveDialog:s.showSaveDialog, saveNameDraft:s.saveNameDraft,
+      // board
+      pickerName, boardCats, endGame:()=>this.endGame(),
+      // play
+      curCatName: cat?cat.name:'', curCatPun: cat ? (this.PUNS[cat.id]||cat.name) : '', curCatIcon: cat?cat.icon:'ti-help',
+      qLabel: cat ? ((s.curQIdx+1)+' / '+cat.questions) : '', curPoints: isBeeQ ? beeScoreVal : ((item && item.points!=null) ? item.points : (cat?cat.points:0)),
+      timeLabel:this.fmt(s.timeLeft), timerColor:ringCol,
+      timerRing:'conic-gradient('+ringCol+' 0deg '+deg+'deg, rgba(255,255,255,.1) '+deg+'deg 360deg)',
+      timerAnim: (s.running&&low) ? 'animation:pulse 1s ease-in-out infinite' : '',
+      stageStyle: isImageQ ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
+      showImage: isImageQ && !!curImage, showImagePlaceholder: isImageQ && !curImage,
+      showTriviaBlock: isTriviaQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
+      curImageStyle: 'width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
+      curPrompt, triviaOptions, pickTrivia:(i)=>this.pickTrivia(i),
+      connTiles, connSolved, connHearts, connMsg, connSubmitDisabled,
+      connShuffle:()=>this.connShuffle(), connDeselect:()=>this.connDeselect(), connSubmit:()=>this.connSubmit(),
+      wordleRows, wordleKeyRows, wordleMsg,
+      beeCenter, beeHexes, beeInput, beeMsg, beeNoWord, beeScoreLabel:'+'+beeScoreVal, beeFound, beeFoundCount: beeFound.length+' word'+(beeFound.length===1?'':'s'),
+      beeCenterClick:()=>this.beeType(beeCenter && beeCenter!=='?'?beeCenter:''), beeDelete:()=>this.beeDelete(), beeShuffle:()=>this.beeShuffle(), beeEnter:()=>this.beeEnter(),
+      goToPlayers:()=>this.goToPlayers(),
+      curAnswer: item && item.answer ? item.answer : 'Not set',
+      showBottomControls: isImageQ,
+      revealed:s.revealed, notRevealed:!s.revealed, reveal:()=>this.reveal(), backToPuzzle:()=>this.backToPuzzle(),
+      playToggle:()=>this.playToggle(), playIcon: s.running?'ti-player-pause':'ti-player-play', playLabel: s.running?'Pause':'Start timer',
+      backToBoard:()=>this.backToBoard(),
+      playPlayers,
+      flashRight:s.flash==='right', flashWrong:s.flash==='wrong',
+      // board (leaderboard)
+      boardSub: isFinal ? 'Final results' : 'Current standings',
+      showCongrats: isFinal,
+      congratsText: 'Congratulations, '+(vm(sorted[0]).name)+' — Ultimate Gamenight Champion!',
+      hasRemaining: !isFinal,
+      p1:vm(sorted[0]), p2:vm(sorted[1]), p3:vm(sorted[2]),
+      hasSecond: sorted.length>1, hasThird: sorted.length>2,
+      boardRest:rest, confetti,
+      resumeGame:()=>this.resumeGame(),
+      isBoardScreen2:false,
+      nada:'',
+    };
+  }
+  ini(name){ if(!name) return '?'; const parts=String(name).trim().split(/\s+/); if(parts.length>=2) return (parts[0][0]+parts[1][0]).toUpperCase(); return name.trim().slice(0,2).toUpperCase(); }
+}
+
+</script>
+</body>
+</html>
