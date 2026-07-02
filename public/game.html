@@ -174,6 +174,36 @@ input:focus,textarea:focus{outline:none}
               </sc-for>
             </div>
           </sc-if>
+          <sc-if value="{{ contentIsImageQuiz }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+              <sc-for list="{{ contentItems }}" as="it" hint-placeholder-count="5">
+                <div style="background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <div style="font:700 9px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#C084FC">Question {{ it.num }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.3);border-radius:7px;padding:3px 7px">
+                      <i class="ti ti-minus" onClick="{{ it.pDec }}" style="font-size:12px;color:#F4C95D;cursor:pointer"></i>
+                      <span style="font:400 13px 'Anton';color:#F4C95D;min-width:14px;text-align:center">{{ it.points }}</span>
+                      <i class="ti ti-plus" onClick="{{ it.pInc }}" style="font-size:12px;color:#F4C95D;cursor:pointer"></i>
+                    </div>
+                  </div>
+                  <label style="{{ it.dropStyle }}">
+                    <sc-if value="{{ it.hasImage }}" hint-placeholder-val="{{ false }}"><div style="{{ it.imgBoxStyle }}"></div></sc-if>
+                    <sc-if value="{{ it.noImage }}"><i class="ti ti-photo-up" style="font-size:26px;color:#a98fd0"></i><span style="font:600 9px monospace;color:#c9b6ee">UPLOAD IMAGE</span></sc-if>
+                    <input type="file" accept="image/*" onChange="{{ it.onUpload }}" style="display:none">
+                  </label>
+                  <div style="display:flex;flex-direction:column;gap:7px">
+                    <sc-for list="{{ it.options }}" as="opt" hint-placeholder-count="4">
+                      <div style="{{ opt.rowStyle }}">
+                        <div onClick="{{ opt.onMark }}" style="{{ opt.dotStyle }}"></div>
+                        <input placeholder="Answer choice" onChange="{{ opt.onText }}" value="{{ opt.text }}" style="flex:1;min-width:0;background:transparent;border:none;color:#F3E8FF;font:600 12px 'Poppins'">
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="font:500 9px 'Poppins';color:#8f74c4">Tap the dot to mark the correct answer.</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
           <sc-if value="{{ contentIsStack }}">
             <div style="display:flex;flex-direction:column;gap:14px;max-width:840px">
               <sc-for list="{{ contentItems }}" as="it" hint-placeholder-count="4">
@@ -342,6 +372,17 @@ input:focus,textarea:focus{outline:none}
         <div style="flex:1;border-radius:16px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;{{ stageStyle }}">
           <sc-if value="{{ showImage }}" hint-placeholder-val="{{ false }}"><div style="{{ curImageStyle }}"></div></sc-if>
           <sc-if value="{{ showImagePlaceholder }}"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><i class="ti ti-photo" style="font-size:44px;color:#a98fd0"></i><div style="font:700 12px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 10px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div></sc-if>
+          <sc-if value="{{ showImageQuizBlock }}">
+            <div class="gn-scroll" style="padding:18px 24px 22px;display:flex;flex-direction:column;gap:14px;width:100%;height:100%;overflow:auto;align-items:center;justify-content:center">
+              <sc-if value="{{ showImageQuizImage }}" hint-placeholder-val="{{ false }}"><div style="{{ curImageQuizStyle }}"></div></sc-if>
+              <sc-if value="{{ showImageQuizPlaceholder }}"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 0"><i class="ti ti-photo" style="font-size:40px;color:#a98fd0"></i><div style="font:700 11px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 9px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div></sc-if>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px">
+                <sc-for list="{{ imageQuizOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.text }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
           <sc-if value="{{ showTriviaBlock }}">
             <div style="padding:24px;display:flex;flex-direction:column;gap:18px;width:100%;height:100%;align-items:center;justify-content:center">
               <div style="font:700 clamp(20px,2.6vw,32px) 'Poppins';color:#F3E8FF;text-align:center;text-wrap:balance">{{ curPrompt }}</div>
@@ -540,10 +581,10 @@ class Component extends DCLogic {
 
   buildCats() {
     const defs = [
-      { id:'geo', name:'Geoguessr', icon:'ti-world', tag:'GEO', kind:'image', questions:5, timer:30, points:10, on:true },
+      { id:'geo', name:'Guess the Location', icon:'ti-world', tag:'GEO', kind:'imagequiz', questions:5, timer:30, points:10, on:true },
       { id:'logo', name:'Guess the Logo', icon:'ti-building-store', tag:'LOGO', kind:'image', questions:8, timer:15, points:10, on:true },
       { id:'flag', name:'Guess the Flag', icon:'ti-flag', tag:'FLAG', kind:'image', questions:8, timer:15, points:10, on:false },
-      { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'image', questions:6, timer:20, points:10, on:false },
+      { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'imagequiz', questions:6, timer:20, points:10, on:false },
       { id:'wordle', name:'Wordle', icon:'ti-square-letter-w', tag:'WORD', kind:'wordle', questions:3, timer:60, points:5, on:false },
       { id:'conn', name:'Connections', icon:'ti-grid-dots', tag:'CONN', kind:'grid', questions:2, timer:180, points:8, on:true },
       { id:'bee', name:'Spelling Bee', icon:'ti-hexagon', tag:'BEE', kind:'bee', questions:3, timer:90, points:5, on:false },
@@ -553,6 +594,7 @@ class Component extends DCLogic {
     return defs.map(d => ({ ...d, items: this.mkItems(d.kind, d.questions) }));
   }
   mkItems(kind, n) {
+    if (kind==='imagequiz') return Array.from({ length:n }, () => ({ image:null, answer:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), points:10 }));
     if (kind==='trivia') return Array.from({ length:n }, () => ({ prompt:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), points:10 }));
     if (kind==='grid') return Array.from({ length:n }, () => ({ groups:[0,1,2,3].map(()=>({ name:'', words:['','','',''] })), points:8 }));
     if (kind==='wordle') return Array.from({ length:n }, () => ({ word:'', points:5 }));
@@ -568,7 +610,7 @@ class Component extends DCLogic {
     cats:this.buildCats(), players:this.buildPlayers(),
     contentId:'geo',
     curCatId:null, curQIdx:0, timeLeft:0, running:false, revealed:false, lastResult:0, flash:null,
-    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null,
+    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null, imageQuizPick:null,
     saves:[], showSaveDialog:false, saveNameDraft:'',
   };
 
@@ -636,14 +678,14 @@ class Component extends DCLogic {
   startGame(){ this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:0})) }); }
   curCat(){ return this.state.cats.find(c=>c.id===this.state.curCatId); }
   curItem(){ const c=this.curCat(); return c ? c.items[this.state.curQIdx] : null; }
-  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null }); }
+  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null }); }
   backToBoard(){
     const cat=this.curCat();
     this.stopTimer();
     this.setState(s=>{
       const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
       const pickerIdx = s.players.length ? (s.pickerIdx+1)%s.players.length : 0;
-      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null };
+      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null };
     });
   }
   reveal(){
@@ -685,6 +727,7 @@ class Component extends DCLogic {
   beeScore(len,isPan){ if(isPan) return 10; if(len>7) return 3; if(len>5) return 2; return 1; }
   beeEnter(){ const b=this.state.bee; if(!b) return; const w=b.input; let err=null; if(w.length<4) err='Too short — 4 letters minimum'; else if(!b.center) err='Host: set a center letter first'; else if(!w.includes(b.center)) err='Must use the center letter '+b.center; else if([...w].some(ch=>!b.allowed.has(ch))) err='Uses a letter not in the hive'; else if(b.found.includes(w)) err='Already found that one'; if(err){ this.playWrong(); this.flashFx('wrong'); this.setState({ bee:{...b, msg:err} }); return; } const isPan=b.allowed.size>0 && [...b.allowed].every(l=>w.includes(l)); const pts=this.beeScore(w.length,isPan); this.playRight(); this.flashFx('right'); this.setState({ bee:{...b, found:[w,...b.found], score:b.score+pts, input:'', msg:(isPan?('PANGRAM! +'+pts):('+'+pts+(pts>1?' points':' point'))) } }); }
   pickTrivia(i){ const item=this.curItem(); if(!item||!item.options) return; const correct=!!(item.options[i]&&item.options[i].correct); if(correct){ this.playRight(); this.flashFx('right'); } else { this.playWrong(); this.flashFx('wrong'); } this.setState({ triviaPick:i, revealed:true }); }
+  pickImageQuiz(i){ const item=this.curItem(); if(!item||!item.options) return; const correct=!!(item.options[i]&&item.options[i].correct); if(correct){ this.playRight(); this.flashFx('right'); } else { this.playWrong(); this.flashFx('wrong'); } this.setState({ imageQuizPick:i, revealed:true }); }
 
   // ---------- RENDER ----------
   pill(active){ return active
@@ -695,7 +738,7 @@ class Component extends DCLogic {
     const s = this.state;
     const isSetup = s.screen==='setup';
     const active = this.activeCats();
-    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : 'image';
+    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : k==='imagequiz' ? 'image+quiz' : 'image';
 
     // setup step 1 cats
     const setupCats = s.cats.map(c=>{
@@ -721,7 +764,7 @@ class Component extends DCLogic {
     // content rail
     const railSel = s.contentId;
     const contentRail = active.map(c=>{
-      const filled = c.items.filter(it=> c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? (!!it.word && it.word.length===7 && !!it.center && it.word.includes(it.center)) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
+      const filled = c.items.filter(it=> c.kind==='imagequiz' ? (!!it.image && it.options && it.options.some(o=>o.correct) && it.options.every(o=>o.text)) : c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? (!!it.word && it.word.length===7 && !!it.center && it.word.includes(it.center)) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
       const done = filled>=c.questions && c.questions>0;
       const sel = c.id===railSel;
       return { ...c, sel,
@@ -735,16 +778,17 @@ class Component extends DCLogic {
       };
     });
     const selCat = s.cats.find(c=>c.id===railSel) || active[0] || s.cats[0];
-    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter a 7-letter word (the pangram) and the center letter every answer must include. Players form words of 4+ letters from these letters.' : 'Drop in one image per question and type the correct answer.') : '';
+    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='imagequiz' ? 'Upload an image per question and provide 4 answer choices — mark the correct one.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter a 7-letter word (the pangram) and the center letter every answer must include. Players form words of 4+ letters from these letters.' : 'Drop in one image per question and type the correct answer.') : '';
 
     const contentItems = selCat ? selCat.items.map((it,idx)=>{
       const isImageKind = selCat.kind==='image';
+      const isImageQuizKind = selCat.kind==='imagequiz';
       const isTriviaKind = selCat.kind==='trivia';
       const isGridKind = selCat.kind==='grid';
       const isWordleKind = selCat.kind==='wordle';
       const isBeeKind = selCat.kind==='bee';
       const stepItemP=(d)=>this.patchItem(selCat.id, idx, x=>{ x.points=Math.max(0,Math.min(100,(x.points!=null?x.points:0)+d)); return x; });
-      const base = { num:idx+1, isImageKind, isTriviaKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind };
+      const base = { num:idx+1, isImageKind, isImageQuizKind, isTriviaKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind };
       if(isImageKind){
         const hasImage = !!it.image;
         return { ...base, hasImage, noImage: !it.image, answer:it.answer,
@@ -752,6 +796,22 @@ class Component extends DCLogic {
           dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
           onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
           onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
+        };
+      }
+      if(isImageQuizKind){
+        const hasImage = !!it.image;
+        const options = (it.options||[]).map((o,oi)=>({
+          text: o.text,
+          dotStyle: 'width:16px;height:16px;border-radius:50%;flex:none;cursor:pointer;border:2px solid '+(o.correct?'#8EF0A8':'rgba(192,132,252,.4)')+';background:'+(o.correct?'#8EF0A8':'transparent'),
+          rowStyle: 'display:flex;align-items:center;gap:10px;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:8px;padding:9px 11px',
+          onMark:()=>this.patchItem(selCat.id, idx, x=>{ x.options=x.options.map((op,j)=>({...op,correct:j===oi})); return x; }),
+          onText:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.options=x.options.map((op,j)=>j===oi?{...op,text:ev.target.value}:op); return x; }),
+        }));
+        return { ...base, hasImage, noImage: !it.image,
+          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:cover;background-position:center;background-image:url('+JSON.stringify(it.image||'')+')',
+          dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
+          onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
+          options,
         };
       }
       if(isTriviaKind){
@@ -828,12 +888,23 @@ class Component extends DCLogic {
     const low = s.timeLeft<=5 && s.timeLeft>0;
     const ringCol = low ? '#f87171' : '#F4C95D';
     const isImageQ = !!cat && cat.kind==='image';
+    const isImageQuizQ = !!cat && cat.kind==='imagequiz';
     const isTriviaQ = !!cat && cat.kind==='trivia';
     const isConnQ = !!cat && cat.kind==='grid';
     const isWordleQ = !!cat && cat.kind==='wordle';
     const isBeeQ = !!cat && cat.kind==='bee';
-    const curImage = (isImageQ && item) ? item.image : null;
+    const curImage = ((isImageQ || isImageQuizQ) && item) ? item.image : null;
     const curPrompt = (isTriviaQ && item) ? (item.prompt||'(No question typed yet)') : '';
+    const imageQuizOptions = (isImageQuizQ && item && item.options) ? item.options.map((o,i)=>{
+      const picked = s.imageQuizPick===i;
+      const showGreen = o.correct && (s.revealed || s.imageQuizPick!=null);
+      const showRed = picked && !o.correct;
+      const b='padding:14px;border-radius:12px;font:700 14px Poppins;text-align:center;cursor:pointer;transition:.15s;';
+      const style = showGreen ? b+'background:rgba(94,240,168,.18);border:2px solid #8EF0A8;color:#8EF0A8'
+        : showRed ? b+'background:rgba(248,113,113,.2);border:2px solid #f87171;color:#f8a3a3'
+        : b+'background:#150c30;border:1px solid rgba(192,132,252,.2);color:#E9D5FF';
+      return { text:o.text||'—', style, onClick:()=>this.pickImageQuiz(i) };
+    }) : [];
     const triviaOptions = (isTriviaQ && item) ? item.options.map((o,i)=>{
       const picked = s.triviaPick===i;
       const showGreen = o.correct && (s.revealed || s.triviaPick!=null);
@@ -919,7 +990,7 @@ class Component extends DCLogic {
       isStep1:s.step===1, isStep2:s.step===2, isStep3:s.step===3,
       step1Pill:this.pill(s.step===1), step2Pill:this.pill(s.step===2), step3Pill:this.pill(s.step===3),
       rulesSummary: active.length+' rounds · '+active.reduce((a,c)=>a+c.questions,0)+' Q',
-      setupCats, contentRail, contentItems, contentIsImage: !!selCat && selCat.kind==='image', contentIsStack: !!selCat && selCat.kind!=='image',
+      setupCats, contentRail, contentItems, contentIsImage: !!selCat && selCat.kind==='image', contentIsImageQuiz: !!selCat && selCat.kind==='imagequiz', contentIsStack: !!selCat && selCat.kind!=='image' && selCat.kind!=='imagequiz',
       selName: selCat?selCat.name:'', selIcon: selCat?selCat.icon:'ti-photo', selHint,
       players, addPlayer:()=>this.addPlayer(), playerNoun:noun,
       toggleTeams:()=>this.toggleTeams(),
@@ -939,11 +1010,15 @@ class Component extends DCLogic {
       timeLabel:this.fmt(s.timeLeft), timerColor:ringCol,
       timerRing:'conic-gradient('+ringCol+' 0deg '+deg+'deg, rgba(255,255,255,.1) '+deg+'deg 360deg)',
       timerAnim: (s.running&&low) ? 'animation:pulse 1s ease-in-out infinite' : '',
-      stageStyle: isImageQ ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
+      stageStyle: (isImageQ || isImageQuizQ) ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
       showImage: isImageQ && !!curImage, showImagePlaceholder: isImageQ && !curImage,
+      showImageQuizBlock: isImageQuizQ,
+      showImageQuizImage: isImageQuizQ && !!curImage, showImageQuizPlaceholder: isImageQuizQ && !curImage,
       showTriviaBlock: isTriviaQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
       curImageStyle: 'width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
+      curImageQuizStyle: 'width:100%;height:180px;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+');border-radius:10px',
       curPrompt, triviaOptions, pickTrivia:(i)=>this.pickTrivia(i),
+      imageQuizOptions, pickImageQuiz:(i)=>this.pickImageQuiz(i),
       connTiles, connSolved, connHearts, connMsg, connSubmitDisabled,
       connShuffle:()=>this.connShuffle(), connDeselect:()=>this.connDeselect(), connSubmit:()=>this.connSubmit(),
       wordleRows, wordleKeyRows, wordleMsg,
