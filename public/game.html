@@ -31,10 +31,21 @@ input:focus,textarea:focus{outline:none}
 @keyframes buzzsh{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px)}75%{transform:translateY(3px)}}
 @keyframes flashin{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
 @keyframes fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fwburst{0%{transform:scale(0);opacity:1}70%{opacity:.7}100%{transform:scale(1.5);opacity:0}}
+@keyframes fwspark{0%{transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(0);opacity:1}100%{transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(calc(var(--d,60px) * -1));opacity:0}}
 </style>
 </helmet>
 
 <div style="position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 50% -15%,#1c1140 0%,#0c0718 58%,#070410 100%)">
+
+<!-- ===================== ZOOM OVERLAY ===================== -->
+<sc-if value="{{ showZoomOverlay }}">
+  <div onClick="{{ onCloseZoom }}" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;cursor:zoom-out">
+    <div style="{{ zoomImageStyle }}"></div>
+    <div style="position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ti ti-x" style="font-size:18px;color:#fff"></i></div>
+    <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font:600 10px 'Poppins';letter-spacing:.12em;color:rgba(255,255,255,.45);text-transform:uppercase">Click anywhere to close</div>
+  </div>
+</sc-if>
 
 <!-- ===================== HOME ===================== -->
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
@@ -221,6 +232,10 @@ input:focus,textarea:focus{outline:none}
                       </div>
                     </sc-if>
                   </div>
+                  <sc-if value="{{ it.isChampKind }}">
+                    <textarea placeholder="Type the championship question…" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" rows="3" style="width:100%;resize:vertical;background:#0d0722;border:1px solid rgba(244,201,93,.3);border-radius:8px;color:#F4C95D;font:500 13px 'Poppins';padding:11px"></textarea>
+                    <input placeholder="Answer (host reveals on command)" onChange="{{ it.onAnswer }}" value="{{ it.answer }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.25);border-radius:8px;color:#F4C95D;font:600 11px 'Poppins';padding:8px">
+                  </sc-if>
                   <sc-if value="{{ it.isTriviaKind }}">
                     <textarea placeholder="Type the trivia question…" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" rows="2" style="width:100%;resize:vertical;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:8px;color:#F3E8FF;font:500 13px 'Poppins';padding:11px"></textarea>
                     <div style="display:flex;flex-direction:column;gap:8px">
@@ -380,10 +395,14 @@ input:focus,textarea:focus{outline:none}
           <sc-if value="{{ showImage }}" hint-placeholder-val="{{ false }}"><div style="{{ curImageStyle }}"></div></sc-if>
           <sc-if value="{{ showImagePlaceholder }}"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><i class="ti ti-photo" style="font-size:44px;color:#a98fd0"></i><div style="font:700 12px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 10px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div></sc-if>
           <sc-if value="{{ showImageQuizBlock }}">
-            <div class="gn-scroll" style="padding:18px 24px 22px;display:flex;flex-direction:column;gap:14px;width:100%;height:100%;overflow:auto;align-items:center;justify-content:center">
-              <sc-if value="{{ showImageQuizImage }}" hint-placeholder-val="{{ false }}"><div style="{{ curImageQuizStyle }}"></div></sc-if>
-              <sc-if value="{{ showImageQuizPlaceholder }}"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 0"><i class="ti ti-photo" style="font-size:40px;color:#a98fd0"></i><div style="font:700 11px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 9px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div></sc-if>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px">
+            <div style="display:flex;flex-direction:column;width:100%;height:100%">
+              <sc-if value="{{ showImageQuizImage }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ onZoomImage }}" style="{{ curImageQuizStyle }};flex:1;min-height:0;cursor:zoom-in" title="Click to zoom"></div>
+              </sc-if>
+              <sc-if value="{{ showImageQuizPlaceholder }}">
+                <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><i class="ti ti-photo" style="font-size:44px;color:#a98fd0"></i><div style="font:700 12px monospace;letter-spacing:.06em;color:#c9b6ee">NO IMAGE UPLOADED</div><div style="font:500 10px 'Poppins';color:#8f74c4">Add it in Setup → Content</div></div>
+              </sc-if>
+              <div style="flex:none;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(10,6,20,.6)">
                 <sc-for list="{{ imageQuizOptions }}" as="opt" hint-placeholder-count="4">
                   <div onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.text }}</div>
                 </sc-for>
@@ -399,6 +418,12 @@ input:focus,textarea:focus{outline:none}
                 </sc-for>
               </div>
               <sc-if value="{{ notRevealed }}"><button onClick="{{ reveal }}" style="display:flex;align-items:center;gap:9px;background:#7C3AED;color:#fff;font:700 13px 'Poppins';border:none;border-radius:12px;padding:11px 24px;cursor:pointer;box-shadow:0 0 20px rgba(124,58,237,.5)"><i class="ti ti-eye" style="font-size:16px"></i>Reveal answer</button></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showChampBlock }}">
+            <div style="padding:32px;display:flex;flex-direction:column;gap:14px;width:100%;height:100%;align-items:center;justify-content:center">
+              <div style="font:700 8px 'Poppins';letter-spacing:.3em;text-transform:uppercase;color:#F4C95D">Championship Round</div>
+              <div style="font:400 clamp(24px,3.5vw,48px) 'Anton';color:#F3E8FF;text-align:center;text-wrap:balance;letter-spacing:.02em;line-height:1.15">{{ curPrompt }}</div>
             </div>
           </sc-if>
           <sc-if value="{{ showConnPuzzle }}">
@@ -499,9 +524,17 @@ input:focus,textarea:focus{outline:none}
         <button onClick="{{ playToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#150c30;border:1px solid rgba(192,132,252,.3);border-radius:11px;padding:11px;color:#E9D5FF;font:700 12px 'Poppins';cursor:pointer"><i class="ti {{ playIcon }}" style="font-size:16px;color:#C084FC"></i>{{ playLabel }}</button>
         <button onClick="{{ backToBoard }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;border:none;border-radius:11px;padding:11px;font:800 12px 'Poppins';cursor:pointer;box-shadow:0 0 16px rgba(244,201,93,.35)"><i class="ti ti-layout-grid" style="font-size:15px"></i>Back to board</button>
         <sc-if value="{{ curHint }}">
-          <div style="background:#150c30;border:1px solid rgba(192,132,252,.2);border-radius:11px;padding:10px 11px">
-            <div style="font:700 8px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#8f74c4;margin-bottom:5px">Hint</div>
-            <div style="font:500 11px 'Poppins';color:#E9D5FF;line-height:1.5;word-break:break-word">{{ curHint }}</div>
+          <div onClick="{{ hintToggle }}" style="background:#150c30;border:1px solid rgba(192,132,252,.2);border-radius:11px;padding:10px 11px;cursor:pointer">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div style="font:700 8px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#8f74c4">Hint</div>
+              <i class="ti {{ hintRevealed ? 'ti-eye-off' : 'ti-eye' }}" style="font-size:12px;color:#8f74c4"></i>
+            </div>
+            <sc-if value="{{ hintRevealed }}">
+              <div style="font:500 11px 'Poppins';color:#E9D5FF;line-height:1.5;word-break:break-word">{{ curHint }}</div>
+            </sc-if>
+            <sc-if value="{{ curHintHidden }}">
+              <div style="font:500 10px 'Poppins';color:#4a3a70;font-style:italic">Tap to reveal…</div>
+            </sc-if>
           </div>
         </sc-if>
         <div style="margin-top:auto;background:#150c30;border:1px solid rgba(192,132,252,.16);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:8px"><i class="ti ti-volume" style="font-size:15px;color:#F4C95D"></i><div><div style="font:700 9px 'Poppins';color:#F3E8FF">Sound FX on</div><div style="font:500 8px monospace;color:#8f74c4">ding / buzzer</div></div></div>
@@ -530,6 +563,9 @@ input:focus,textarea:focus{outline:none}
     <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.06) 50%,transparent 58%);animation:sweep 7s ease-in-out infinite;pointer-events:none"></div>
     <sc-for list="{{ confetti }}" as="c" hint-placeholder-count="0">
       <div style="{{ c.style }}"></div>
+    </sc-for>
+    <sc-for list="{{ fireworks }}" as="fw" hint-placeholder-count="0">
+      <div style="{{ fw.style }}"></div>
     </sc-for>
     <div style="position:relative;text-align:center">
       <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">{{ boardSub }}</div>
@@ -588,7 +624,7 @@ input:focus,textarea:focus{outline:none}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showHostBadge&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;},&quot;showTagline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;},&quot;showHomeStats&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Home screen&quot;}}">
 class Component extends DCLogic {
-  PUNS = { geo:'Where in the World', logo:'Brand Slam', flag:'Flag Day', who:'Face Off', wordle:'Word Up', conn:'Connect the Dots', bee:'To Bee or Not to Bee', rebus:'Read Between the Lines', trivia:'Trivia Pursuit' };
+  PUNS = { geo:'Where in the World', logo:'Brand Slam', flag:'Flag Day', who:'Face Off', wordle:'Word Up', conn:'Connect the Dots', bee:'To Bee or Not to Bee', rebus:'Read Between the Lines', trivia:'Trivia Pursuit', champ:'The Championship Round' };
   CONN_COLORS = ['#F4C95D','#C084FC','#5ED3F0','#8EF0A8'];
   COLORS = ['#F4C95D','#C084FC','#7C3AED','#5ED3F0','#F0855E','#8EF0A8','#F05EC0','#B8F05E'];
 
@@ -603,10 +639,12 @@ class Component extends DCLogic {
       { id:'bee', name:'Spelling Bee', icon:'ti-hexagon', tag:'BEE', kind:'bee', questions:3, timer:90, points:5, on:false },
       { id:'rebus', name:'Rebus Puzzles', icon:'ti-puzzle', tag:'REBUS', kind:'image', questions:6, timer:20, points:8, on:false },
       { id:'trivia', name:'Trivia', icon:'ti-bulb', tag:'TRIV', kind:'trivia', questions:10, timer:20, points:5, on:true },
+      { id:'champ', name:'Championship Round', icon:'ti-crown', tag:'CHAMP', kind:'championship', questions:5, timer:45, points:20, on:false },
     ];
     return defs.map(d => ({ ...d, items: this.mkItems(d.kind, d.questions) }));
   }
   mkItems(kind, n) {
+    if (kind==='championship') return Array.from({ length:n }, () => ({ prompt:'', answer:'', hint:'', points:20 }));
     if (kind==='imagequiz') return Array.from({ length:n }, () => ({ image:null, answer:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), hint:'', points:10 }));
     if (kind==='trivia') return Array.from({ length:n }, () => ({ prompt:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), hint:'', points:10 }));
     if (kind==='grid') return Array.from({ length:n }, () => ({ groups:[0,1,2,3].map(()=>({ name:'', words:['','','',''] })), hint:'', points:8 }));
@@ -623,7 +661,7 @@ class Component extends DCLogic {
     cats:this.buildCats(), players:this.buildPlayers(),
     contentId:'geo',
     curCatId:null, curQIdx:0, timeLeft:0, running:false, revealed:false, lastResult:0, flash:null,
-    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null, imageQuizPick:null,
+    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false,
     saves:[], showSaveDialog:false, saveNameDraft:'',
   };
 
@@ -655,6 +693,39 @@ class Component extends DCLogic {
   playRight(){ const c=this.ac(); if(!c)return; const t=c.currentTime; [660,880,1320].forEach((f,i)=>{ const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f; const s=t+i*0.11; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.32,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.2); o.connect(g).connect(c.destination); o.start(s); o.stop(s+0.22); }); }
   playWrong(){ const c=this.ac(); if(!c)return; const t=c.currentTime; const o=c.createOscillator(),g=c.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(70,t+0.5); g.gain.setValueAtTime(0.28,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.55); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.56); }
 
+  // ---- background music ----
+  _bgm = { ctx:null, sched:null, mode:null, step:0, next:0, out:null };
+  bgmCtx(){ if(!this._bgm.ctx){ try{this._bgm.ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} } if(this._bgm.ctx&&this._bgm.ctx.state==='suspended') this._bgm.ctx.resume(); return this._bgm.ctx; }
+  bgmNote(ctx,out,hz,t,dur,type,vol){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=hz; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.connect(g); g.connect(out); o.start(t); o.stop(t+dur+0.05); }
+  bgmKick(ctx,out,t){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(38,t+0.15); g.gain.setValueAtTime(0.38,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2); o.connect(g); g.connect(out); o.start(t); o.stop(t+0.25); }
+  bgmHat(ctx,out,t,v=0.04){ const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*0.04),ctx.sampleRate),d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain(); f.type='highpass';f.frequency.value=7000; g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.04); s.buffer=b; s.connect(f); f.connect(g); g.connect(out); s.start(t); }
+  startBGM(mode){ if(this._bgm.mode===mode) return; this.stopBGM(); const ctx=this.bgmCtx(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.32; out.connect(ctx.destination); this._bgm={...this._bgm,ctx,mode,step:0,next:ctx.currentTime+0.1,out}; this._bgmTick(); }
+  stopBGM(){ if(this._bgm.sched){clearTimeout(this._bgm.sched);this._bgm.sched=null;} if(this._bgm.out){try{this._bgm.out.disconnect();}catch(e){} this._bgm.out=null;} this._bgm.mode=null; }
+  _bgmTick(){ const b=this._bgm,ctx=b.ctx,out=b.out; if(!ctx||!out||!b.mode)return; const spb=60/(b.mode==='play'?138:76); while(b.next<ctx.currentTime+0.35){this._bgmStep(ctx,out,b.next,b.step,spb);b.step=(b.step+1)%16;b.next+=spb*0.5;} b.sched=setTimeout(()=>this._bgmTick(),100); }
+  _bgmStep(ctx,out,t,step,spb){ const m=this._bgm.mode;
+    if(m==='play'){
+      if(step===0||step===8) this.bgmKick(ctx,out,t);
+      if(step%2===0) this.bgmHat(ctx,out,t,step%4===0?0.055:0.03);
+      const bass=[65,65,82,65,65,82,98,82,65,65,82,65,73,82,98,82];
+      this.bgmNote(ctx,out,bass[step]*0.5,t,spb*0.85,'sawtooth',0.08);
+      const mel=[523,0,659,0,784,0,659,784,523,0,659,0,698,659,784,0];
+      if(mel[step]) this.bgmNote(ctx,out,mel[step],t,spb*0.42,'square',0.045);
+    } else {
+      if(step===0) this.bgmKick(ctx,out,t);
+      if(step===4||step===12) this.bgmHat(ctx,out,t,0.022);
+      const ch=[[261,329,392],[349,440,523],[392,494,587],[349,440,523]][Math.floor(step/4)%4];
+      if(step%4===0) ch.forEach(f=>this.bgmNote(ctx,out,f,t,spb*1.9,'sine',0.038));
+      const mel=[392,0,440,523,0,440,0,392,349,0,392,440,0,329,0,392];
+      if(mel[step]) this.bgmNote(ctx,out,mel[step]*0.5,t,spb*0.75,'triangle',0.042);
+    }
+  }
+  playFanfare(){ const ctx=this.bgmCtx(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.5; out.connect(ctx.destination); const t=ctx.currentTime; const seq=[[523,0],[659,0.12],[784,0.24],[1047,0.38],[784,0.72],[880,0.86],[1047,1.02],[1319,1.2]]; seq.forEach(([f,dt])=>{ this.bgmNote(ctx,out,f,t+dt,0.22,'sine',0.2); this.bgmNote(ctx,out,f*0.5,t+dt,0.28,'triangle',0.1); if(f>800) this.bgmNote(ctx,out,f*1.5,t+dt,0.15,'sine',0.07); }); setTimeout(()=>{try{out.disconnect();}catch(e){}},2800); }
+
+  // ---- hint & zoom ----
+  toggleHint(){ this.setState(s=>({ hintRevealed:!s.hintRevealed })); }
+  zoomImage(){ this.setState({ imageZoomed:true }); }
+  closeZoom(){ this.setState({ imageZoomed:false }); }
+
   // ---- timer ----
   stopTimer(){ if(this._iv){ clearInterval(this._iv); this._iv=null; } }
   startTimer(){ this.stopTimer(); if(this.state.timeLeft<=0) return; this.setState({running:true}); this._iv=setInterval(()=>{ this.setState(s=>{ if(s.timeLeft<=1){ this.stopTimer(); this.playWrong(); return {timeLeft:0,running:false}; } return {timeLeft:s.timeLeft-1}; }); },1000); }
@@ -683,8 +754,8 @@ class Component extends DCLogic {
   toggleTeams(){ this.setState(s=>({ useTeams:!s.useTeams })); }
 
   // ---- wizard nav ----
-  goHome(){ this.stopTimer(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
-  goSetup(){ this.ac(); this.setState({ screen:'setup', step:1 }); }
+  goHome(){ this.stopTimer(); this.stopBGM(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  goSetup(){ this.ac(); this.startBGM('ambient'); this.setState({ screen:'setup', step:1 }); }
   nextStep(){ const st=this.state.step; if(st<3){ let ns=st+1; if(ns===2 && !this.activeCats().some(c=>c.id===this.state.contentId)) { const a=this.activeCats(); if(a[0]) this.setState({contentId:a[0].id}); } this.setState({step:ns}); } else { this.startGame(); } }
   prevStep(){ const st=this.state.step; if(st>1) this.setState({step:st-1}); else this.goHome(); }
 
@@ -692,14 +763,15 @@ class Component extends DCLogic {
   startGame(){ this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
   curCat(){ return this.state.cats.find(c=>c.id===this.state.curCatId); }
   curItem(){ const c=this.curCat(); return c ? c.items[this.state.curQIdx] : null; }
-  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null }); }
+  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.startBGM('play'); this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false }); }
   backToBoard(){
     const cat=this.curCat();
     this.stopTimer();
     this.setState(s=>{
       const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
       const pickerIdx = s.players.length ? (s.pickerIdx+1)%s.players.length : 0;
-      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null };
+      this.startBGM('ambient');
+      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false };
     });
   }
   reveal(){
@@ -729,7 +801,7 @@ class Component extends DCLogic {
   flashFx(kind){ this.setState({flash:kind, lastResult:Date.now()}); clearTimeout(this._ft); this._ft=setTimeout(()=>{ this.setState({flash:null}); },800); }
   award(pid){ const cat=this.curCat(); const item=this.curItem(); let pts; if(cat && cat.kind==='bee'){ pts=this.state.bee?this.state.bee.score:0; } else { pts=(item && item.points!=null)?item.points:(cat?cat.points:0); } const s=this.state; const curPicker=s.players.length?s.players[s.pickerIdx%s.players.length]:null; if(curPicker && pid!==curPicker.id) pts=Math.floor(pts/2); this.playRight(); this.flashFx('right'); this.setState(s=>({ players:s.players.map(p=>p.id===pid?{...p,score:p.score+pts}:p) })); }
   wrong(pid, ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); this.playWrong(); this.flashFx('wrong'); }
-  endGame(){ this.stopTimer(); this.setState({screen:'leaderboard'}); }
+  endGame(){ this.stopTimer(); this.stopBGM(); this.setState({screen:'leaderboard'}); setTimeout(()=>this.playFanfare(), 400); }
   resumeGame(){ this.setState({screen:'board'}); }
   goToPlayers(){ this.stopTimer(); this.setState({ screen:'setup', step:3 }); }
 
@@ -752,7 +824,7 @@ class Component extends DCLogic {
     const s = this.state;
     const isSetup = s.screen==='setup';
     const active = this.activeCats();
-    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : k==='imagequiz' ? 'image+quiz' : 'image';
+    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='championship' ? 'q+reveal' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : k==='imagequiz' ? 'image+quiz' : 'image';
 
     // setup step 1 cats
     const setupCats = s.cats.map(c=>{
@@ -778,7 +850,7 @@ class Component extends DCLogic {
     // content rail
     const railSel = s.contentId;
     const contentRail = active.map(c=>{
-      const filled = c.items.filter(it=> c.kind==='imagequiz' ? (!!it.image && it.options && it.options.some(o=>o.correct) && it.options.every(o=>o.text)) : c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? (!!it.word && it.word.length===7 && !!it.center && it.word.includes(it.center)) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
+      const filled = c.items.filter(it=> c.kind==='championship' ? (!!it.prompt && !!it.answer) : c.kind==='imagequiz' ? (!!it.image && it.options && it.options.some(o=>o.correct) && it.options.every(o=>o.text)) : c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? (!!it.word && it.word.length===7 && !!it.center && it.word.includes(it.center)) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
       const done = filled>=c.questions && c.questions>0;
       const sel = c.id===railSel;
       return { ...c, sel,
@@ -792,17 +864,18 @@ class Component extends DCLogic {
       };
     });
     const selCat = s.cats.find(c=>c.id===railSel) || active[0] || s.cats[0];
-    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='imagequiz' ? 'Upload an image per question and provide 4 answer choices — mark the correct one.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter a 7-letter word (the pangram) and the center letter every answer must include. Players form words of 4+ letters from these letters.' : 'Drop in one image per question and type the correct answer.') : '';
+    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='championship' ? 'Type each final-round question and its answer — the host reveals the answer on command.' : selCat.kind==='imagequiz' ? 'Upload an image per question and provide 4 answer choices — mark the correct one.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter a 7-letter word (the pangram) and the center letter every answer must include. Players form words of 4+ letters from these letters.' : 'Drop in one image per question and type the correct answer.') : '';
 
     const contentItems = selCat ? selCat.items.map((it,idx)=>{
       const isImageKind = selCat.kind==='image';
       const isImageQuizKind = selCat.kind==='imagequiz';
       const isTriviaKind = selCat.kind==='trivia';
+      const isChampKind = selCat.kind==='championship';
       const isGridKind = selCat.kind==='grid';
       const isWordleKind = selCat.kind==='wordle';
       const isBeeKind = selCat.kind==='bee';
       const stepItemP=(d)=>this.patchItem(selCat.id, idx, x=>{ x.points=Math.max(0,Math.min(100,(x.points!=null?x.points:0)+d)); return x; });
-      const base = { num:idx+1, isImageKind, isImageQuizKind, isTriviaKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind, hint:it.hint||'', onHint:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.hint=ev.target.value; return x; }) };
+      const base = { num:idx+1, isImageKind, isImageQuizKind, isTriviaKind, isChampKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind, hint:it.hint||'', onHint:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.hint=ev.target.value; return x; }) };
       if(isImageKind){
         const hasImage = !!it.image;
         return { ...base, hasImage, noImage: !it.image, answer:it.answer,
@@ -826,6 +899,12 @@ class Component extends DCLogic {
           dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
           onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
           options,
+        };
+      }
+      if(isChampKind){
+        return { ...base, prompt:it.prompt||'', answer:it.answer||'',
+          onPrompt:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.prompt=ev.target.value; return x; }),
+          onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
         };
       }
       if(isTriviaKind){
@@ -907,12 +986,13 @@ class Component extends DCLogic {
     const isImageQ = !!cat && cat.kind==='image';
     const isImageQuizQ = !!cat && cat.kind==='imagequiz';
     const isTriviaQ = !!cat && cat.kind==='trivia';
+    const isChampQ = !!cat && cat.kind==='championship';
     const isConnQ = !!cat && cat.kind==='grid';
     const isWordleQ = !!cat && cat.kind==='wordle';
     const isBeeQ = !!cat && cat.kind==='bee';
     const curImage = ((isImageQ || isImageQuizQ) && item) ? item.image : null;
     const curHint = (item && item.hint) ? item.hint : '';
-    const curPrompt = (isTriviaQ && item) ? (item.prompt||'(No question typed yet)') : '';
+    const curPrompt = ((isTriviaQ || isChampQ) && item) ? (item.prompt||'(No question typed yet)') : '';
     const imageQuizOptions = (isImageQuizQ && item && item.options) ? item.options.map((o,i)=>{
       const picked = s.imageQuizPick===i;
       const showGreen = o.correct && (s.revealed || s.imageQuizPick!=null);
@@ -993,7 +1073,8 @@ class Component extends DCLogic {
     const max = Math.max(1, ...sorted.map(p=>p.score));
     const vm = p => p ? { ...p, initials:this.ini(p.name) } : { name:'—', initials:'–', score:0 };
     const rest = sorted.slice(3).map((p,i)=>({ ...p, initials:this.ini(p.name), rank:i+4, pct: Math.round((p.score/max)*100)+'%' }));
-    const confetti = s.screen==='leaderboard' ? Array.from({length:18},(_,i)=>{ const cols=['#F4C95D','#C084FC','#fff2cf','#7C3AED']; return { style:'position:absolute;top:0;left:'+((i*5.3)%100)+'%;width:'+(4+i%4)+'px;height:'+(7+i%5)+'px;background:'+cols[i%4]+';border-radius:2px;opacity:.85;animation:drift '+(3.4+(i%5)*0.5)+'s linear '+((i%6)*0.35)+'s infinite' }; }) : [];
+    const confetti = s.screen==='leaderboard' ? Array.from({length:28},(_,i)=>{ const cols=['#F4C95D','#C084FC','#fff2cf','#7C3AED','#5ED3F0','#8EF0A8']; return { style:'position:absolute;top:0;left:'+((i*3.7)%100)+'%;width:'+(3+i%5)+'px;height:'+(6+i%7)+'px;background:'+cols[i%6]+';border-radius:'+(i%3?'50%':'2px')+';opacity:.9;animation:drift '+(2.8+(i%6)*0.4)+'s linear '+((i%7)*0.25)+'s infinite' }; }) : [];
+    const fireworks = s.screen==='leaderboard' ? Array.from({length:7},(_,i)=>{ const cols=['#F4C95D','#C084FC','#5ED3F0','#8EF0A8','#f0888a','#fff2cf','#7C3AED']; const sz=80+i*20; const delay=(i*0.45)%3; return { style:'position:absolute;left:'+((i*14.3+8)%86)+'%;top:'+((i*17.7+5)%55)+'%;width:'+sz+'px;height:'+sz+'px;border-radius:50%;border:3px solid '+cols[i%7]+';pointer-events:none;animation:fwburst 1.6s ease-out '+delay+'s infinite' }; }) : [];
 
     return {
       // screens
@@ -1033,11 +1114,15 @@ class Component extends DCLogic {
       showImage: isImageQ && !!curImage, showImagePlaceholder: isImageQ && !curImage,
       showImageQuizBlock: isImageQuizQ,
       showImageQuizImage: isImageQuizQ && !!curImage, showImageQuizPlaceholder: isImageQuizQ && !curImage,
-      showTriviaBlock: isTriviaQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
+      showTriviaBlock: isTriviaQ, showChampBlock: isChampQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
       curImageStyle: 'width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
-      curImageQuizStyle: 'width:100%;height:180px;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+');border-radius:10px',
+      curImageQuizStyle: 'width:100%;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
+      showZoomOverlay: s.imageZoomed && isImageQuizQ && !!curImage,
+      zoomImageStyle: 'width:90vw;height:90vh;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
+      onZoomImage:()=>this.zoomImage(), onCloseZoom:()=>this.closeZoom(),
       curPrompt, triviaOptions, pickTrivia:(i)=>this.pickTrivia(i),
       imageQuizOptions, pickImageQuiz:(i)=>this.pickImageQuiz(i),
+      hintRevealed: s.hintRevealed, curHintHidden: !!(curHint && !s.hintRevealed), hintToggle:()=>this.toggleHint(),
       connTiles, connSolved, connHearts, connMsg, connSubmitDisabled,
       connShuffle:()=>this.connShuffle(), connDeselect:()=>this.connDeselect(), connSubmit:()=>this.connSubmit(),
       wordleRows, wordleKeyRows, wordleMsg,
@@ -1045,7 +1130,7 @@ class Component extends DCLogic {
       beeCenterClick:()=>this.beeType(beeCenter && beeCenter!=='?'?beeCenter:''), beeDelete:()=>this.beeDelete(), beeShuffle:()=>this.beeShuffle(), beeEnter:()=>this.beeEnter(),
       goToPlayers:()=>this.goToPlayers(),
       curAnswer: item && item.answer ? item.answer : 'Not set',
-      showBottomControls: isImageQ,
+      showBottomControls: isImageQ || isChampQ,
       revealed:s.revealed, notRevealed:!s.revealed, reveal:()=>this.reveal(), backToPuzzle:()=>this.backToPuzzle(),
       playToggle:()=>this.playToggle(), playIcon: s.running?'ti-player-pause':'ti-player-play', playLabel: s.running?'Pause':'Start timer',
       backToBoard:()=>this.backToBoard(),
@@ -1058,7 +1143,7 @@ class Component extends DCLogic {
       hasRemaining: !isFinal,
       p1:vm(sorted[0]), p2:vm(sorted[1]), p3:vm(sorted[2]),
       hasSecond: sorted.length>1, hasThird: sorted.length>2,
-      boardRest:rest, confetti,
+      boardRest:rest, confetti, fireworks,
       resumeGame:()=>this.resumeGame(),
       isBoardScreen2:false,
       nada:'',
