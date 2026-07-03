@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="114" fill="#1a0b2e"/>
+  <!-- Crown body -->
+  <path d="M76 360 L76 196 L156 260 L256 116 L356 260 L436 196 L436 360 Z" fill="#F4C95D"/>
+  <!-- Crown base -->
+  <rect x="76" y="347" width="360" height="86" rx="22" fill="#F4C95D"/>
+  <!-- Purple band -->
+  <rect x="76" y="386" width="360" height="47" rx="16" fill="#C084FC"/>
+  <!-- Crown jewels (dark cutouts) -->
+  <circle cx="256" cy="140" r="26" fill="#1a0b2e"/>
+  <circle cx="156" cy="260" r="17" fill="#1a0b2e"/>
+  <circle cx="356" cy="260" r="17" fill="#1a0b2e"/>
+</svg>

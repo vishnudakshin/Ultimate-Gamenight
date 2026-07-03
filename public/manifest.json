@@ -1,0 +1,17 @@
+{
+  "name": "Ultimate Gamenight",
+  "short_name": "Gamenight",
+  "description": "The whole game show, in your living room.",
+  "start_url": "/game.html",
+  "display": "standalone",
+  "background_color": "#070410",
+  "theme_color": "#1a0b2e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

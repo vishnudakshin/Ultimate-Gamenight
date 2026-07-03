@@ -8,10 +8,18 @@
 <script src="/support.js"></script>
 </head>
 <body>
+<div id="yt-player" style="position:fixed;right:0;bottom:0;width:2px;height:2px;opacity:0;pointer-events:none;z-index:-1"></div>
 <x-dc>
 <helmet data-dc-atomics="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Anton&amp;display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
+<script src="https://www.youtube.com/iframe_api"></script>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<meta name="theme-color" content="#1a0b2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gamenight">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#070410;font-family:'Poppins',system-ui,sans-serif;color:#F3E8FF}
@@ -673,8 +681,13 @@ class Component extends DCLogic {
     saves:[], showSaveDialog:false, saveNameDraft:'',
   };
 
-  componentDidMount(){ this.setState({ saves:this.loadSavesFromStorage() }); this._kd=(e)=>this.onKeyDown(e); window.addEventListener('keydown', this._kd); }
-  componentWillUnmount(){ this.stopTimer(); if(this._kd) window.removeEventListener('keydown', this._kd); }
+  _yt = null; _ytReady = false;
+  componentDidMount(){ this.setState({ saves:this.loadSavesFromStorage() }); this._kd=(e)=>this.onKeyDown(e); window.addEventListener('keydown', this._kd); this._initYT(); this._genIcon(); }
+  componentWillUnmount(){ this.stopTimer(); this.stopBGM(); if(this._kd) window.removeEventListener('keydown', this._kd); if(this._yt){try{this._yt.destroy();}catch(e){} this._yt=null;} }
+  _initYT(){ const init=()=>{ if(!window.YT||!window.YT.Player||!document.getElementById('yt-player')) return; this._yt=new window.YT.Player('yt-player',{ videoId:'-Z0LT59hKHM', playerVars:{autoplay:0,controls:0,disablekb:1,loop:1,playlist:'-Z0LT59hKHM',modestbranding:1,rel:0,iv_load_policy:3,origin:window.location.origin}, events:{onReady:()=>{this._ytReady=true;}} }); }; const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{if(prev)prev();init();}; if(window.YT&&window.YT.Player)init(); }
+  _genIcon(){ try{ const c=document.createElement('canvas'); c.width=180;c.height=180; const cx=c.getContext('2d'); cx.fillStyle='#1a0b2e'; if(cx.roundRect){cx.beginPath();cx.roundRect(0,0,180,180,36);cx.fill();}else{cx.fillRect(0,0,180,180);} cx.fillStyle='#F4C95D'; cx.beginPath();cx.moveTo(26,125);cx.lineTo(26,70);cx.lineTo(55,92);cx.lineTo(90,40);cx.lineTo(125,92);cx.lineTo(154,70);cx.lineTo(154,125);cx.closePath();cx.fill(); if(cx.roundRect){cx.beginPath();cx.roundRect(26,120,128,32,8);cx.fill();}else cx.fillRect(26,120,128,32); cx.fillStyle='#C084FC'; if(cx.roundRect){cx.beginPath();cx.roundRect(26,136,128,16,6);cx.fill();}else cx.fillRect(26,136,128,16); cx.fillStyle='#1a0b2e'; [[90,48,9],[55,92,6],[125,92,6]].forEach(([x,y,r])=>{cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();}); const url=c.toDataURL('image/png'); let l=document.querySelector('link[rel="apple-touch-icon"]'); if(!l){l=document.createElement('link');l.rel='apple-touch-icon';document.head.appendChild(l);} l.href=url; }catch(e){} }
+  ytPlay(){ if(!this._ytReady||!this._yt) return; try{this._yt.unMute();this._yt.setVolume(65);this._yt.playVideo();}catch(e){} }
+  ytPause(){ if(!this._ytReady||!this._yt) return; try{this._yt.pauseVideo();}catch(e){} }
   onKeyDown(e){ const s=this.state; if(s.screen!=='play') return; const cat=this.curCat(); if(!cat) return; const t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')) return;
     if(cat.kind==='wordle'){ if(e.key==='Enter'){ e.preventDefault(); this.wordleEnter(); } else if(e.key==='Backspace'){ e.preventDefault(); this.wordleBackspace(); } else if(/^[a-zA-Z]$/.test(e.key)){ this.wordleType(e.key.toUpperCase()); } return; }
     if(cat.kind==='bee'){ if(e.key==='Enter'){ e.preventDefault(); this.beeEnter(); } else if(e.key==='Backspace'){ e.preventDefault(); this.beeDelete(); } else if(/^[a-zA-Z]$/.test(e.key)){ this.beeType(e.key.toUpperCase()); } return; } }
@@ -762,23 +775,24 @@ class Component extends DCLogic {
   toggleTeams(){ this.setState(s=>({ useTeams:!s.useTeams })); }
 
   // ---- wizard nav ----
-  goHome(){ this.stopTimer(); this.stopBGM(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
-  goSetup(){ this.ac(); this.startBGM('ambient'); this.setState({ screen:'setup', step:1 }); }
+  goHome(){ this.ytPause(); this.stopTimer(); this.stopBGM(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  goSetup(){ this.ytPlay(); this.setState({ screen:'setup', step:1 }); }
   nextStep(){ const st=this.state.step; if(st<3){ let ns=st+1; if(ns===2 && !this.activeCats().some(c=>c.id===this.state.contentId)) { const a=this.activeCats(); if(a[0]) this.setState({contentId:a[0].id}); } this.setState({step:ns}); } else { this.startGame(); } }
   prevStep(){ const st=this.state.step; if(st>1) this.setState({step:st-1}); else this.goHome(); }
 
   // ---- play ----
-  startGame(){ this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  startGame(){ this.ytPlay(); this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
   curCat(){ return this.state.cats.find(c=>c.id===this.state.curCatId); }
   curItem(){ const c=this.curCat(); return c ? c.items[this.state.curQIdx] : null; }
-  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.startBGM('play'); this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false }); }
+  pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); this.ytPause(); this.stopTimer(); const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.startBGM('play'); this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:cat?cat.timer:0, running:false, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false }); }
   backToBoard(){
     const cat=this.curCat();
     this.stopTimer();
+    this.stopBGM();
+    this.ytPlay();
     this.setState(s=>{
       const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
       const pickerIdx = s.players.length ? (s.pickerIdx+1)%s.players.length : 0;
-      this.startBGM('ambient');
       return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false };
     });
   }
@@ -809,8 +823,8 @@ class Component extends DCLogic {
   flashFx(kind){ this.setState({flash:kind, lastResult:Date.now()}); clearTimeout(this._ft); this._ft=setTimeout(()=>{ this.setState({flash:null}); },800); }
   award(pid){ const cat=this.curCat(); const item=this.curItem(); let pts; if(cat && cat.kind==='bee'){ pts=this.state.bee?this.state.bee.score:0; } else { pts=(item && item.points!=null)?item.points:(cat?cat.points:0); } const s=this.state; const curPicker=s.players.length?s.players[s.pickerIdx%s.players.length]:null; if(curPicker && pid!==curPicker.id) pts=Math.floor(pts/2); this.playRight(); this.flashFx('right'); this.setState(s=>({ players:s.players.map(p=>p.id===pid?{...p,score:p.score+pts}:p) })); }
   wrong(pid, ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); this.playWrong(); this.flashFx('wrong'); }
-  endGame(){ this.stopTimer(); this.stopBGM(); this.setState({screen:'leaderboard'}); setTimeout(()=>this.playFanfare(), 400); }
-  resumeGame(){ this.setState({screen:'board'}); }
+  endGame(){ const s=this.state; const totalQ=s.cats.filter(c=>c.on).reduce((a,c)=>a+c.questions,0); const isFinal=totalQ>0&&Object.keys(s.answered).length>=totalQ; this.ytPause(); this.stopTimer(); this.stopBGM(); this.setState({screen:'leaderboard'}); if(isFinal) setTimeout(()=>this.playFanfare(),400); }
+  resumeGame(){ this.ytPlay(); this.setState({screen:'board'}); }
   goToPlayers(){ this.stopTimer(); this.setState({ screen:'setup', step:3 }); }
 
   // ---- spelling bee mechanic ----
@@ -1081,8 +1095,8 @@ class Component extends DCLogic {
     const max = Math.max(1, ...sorted.map(p=>p.score));
     const vm = p => p ? { ...p, initials:this.ini(p.name) } : { name:'—', initials:'–', score:0 };
     const rest = sorted.slice(3).map((p,i)=>({ ...p, initials:this.ini(p.name), rank:i+4, pct: Math.round((p.score/max)*100)+'%' }));
-    const confetti = s.screen==='leaderboard' ? Array.from({length:28},(_,i)=>{ const cols=['#F4C95D','#C084FC','#fff2cf','#7C3AED','#5ED3F0','#8EF0A8']; return { style:'position:absolute;top:0;left:'+((i*3.7)%100)+'%;width:'+(3+i%5)+'px;height:'+(6+i%7)+'px;background:'+cols[i%6]+';border-radius:'+(i%3?'50%':'2px')+';opacity:.9;animation:drift '+(2.8+(i%6)*0.4)+'s linear '+((i%7)*0.25)+'s infinite' }; }) : [];
-    const fireworks = s.screen==='leaderboard' ? (()=>{ const groups=[{c:'#F4C95D',tip:'#fff7d4',n:20,r:58,x:14,y:10},{c:'#5ED3F0',tip:'#c8f2ff',n:18,r:46,x:79,y:7},{c:'#C084FC',tip:'#ead5ff',n:22,r:62,x:46,y:17},{c:'#8EF0A8',tip:'#d5fae0',n:16,r:42,x:21,y:46},{c:'#f0888a',tip:'#ffd5d6',n:20,r:52,x:83,y:37},{c:'#fff2cf',tip:'#ffffff',n:18,r:48,x:59,y:53},{c:'#F4C95D',tip:'#fff7d4',n:24,r:66,x:35,y:27}]; return groups.map((g,i)=>{ const dur=1.3+i*0.15; const bd=(i*0.4)%2.8; const sparks=Array.from({length:g.n},(_,j)=>{ const ang=Math.round((j/g.n)*360); const len=Math.round(g.r*(0.72+(j%4)*0.1)); const dl=bd+(j*0.012)%0.25; return { armStyle:'position:absolute;top:50%;left:50%;width:'+len+'px;height:2px;transform-origin:0 50%;transform:translateY(-50%) rotate('+ang+'deg)', lineStyle:'position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to right,'+g.c+','+g.tip+');transform-origin:0 50%;animation:fwexpand '+dur+'s ease-out '+dl+'s infinite', dotStyle:'position:absolute;top:50%;right:-2px;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:'+g.tip+';animation:fwexpand '+dur+'s ease-out '+dl+'s infinite' }; }); return { wrapStyle:'position:absolute;left:'+g.x+'%;top:'+g.y+'%;pointer-events:none', glowStyle:'position:absolute;top:0;left:0;width:'+Math.round(g.r*1.1)+'px;height:'+Math.round(g.r*1.1)+'px;border-radius:50%;background:radial-gradient('+g.tip+' 0%,'+g.c+' 35%,transparent 70%);transform:translate(-50%,-50%);animation:fwglow '+dur+'s ease-out '+bd+'s infinite', sparks }; }); })() : [];
+    const confetti = (s.screen==='leaderboard'&&isFinal) ? Array.from({length:28},(_,i)=>{ const cols=['#F4C95D','#C084FC','#fff2cf','#7C3AED','#5ED3F0','#8EF0A8']; return { style:'position:absolute;top:0;left:'+((i*3.7)%100)+'%;width:'+(3+i%5)+'px;height:'+(6+i%7)+'px;background:'+cols[i%6]+';border-radius:'+(i%3?'50%':'2px')+';opacity:.9;animation:drift '+(2.8+(i%6)*0.4)+'s linear '+((i%7)*0.25)+'s infinite' }; }) : [];
+    const fireworks = (s.screen==='leaderboard'&&isFinal) ? (()=>{ const groups=[{c:'#F4C95D',tip:'#fff7d4',n:20,r:58,x:14,y:10},{c:'#5ED3F0',tip:'#c8f2ff',n:18,r:46,x:79,y:7},{c:'#C084FC',tip:'#ead5ff',n:22,r:62,x:46,y:17},{c:'#8EF0A8',tip:'#d5fae0',n:16,r:42,x:21,y:46},{c:'#f0888a',tip:'#ffd5d6',n:20,r:52,x:83,y:37},{c:'#fff2cf',tip:'#ffffff',n:18,r:48,x:59,y:53},{c:'#F4C95D',tip:'#fff7d4',n:24,r:66,x:35,y:27}]; return groups.map((g,i)=>{ const dur=1.3+i*0.15; const bd=(i*0.4)%2.8; const sparks=Array.from({length:g.n},(_,j)=>{ const ang=Math.round((j/g.n)*360); const len=Math.round(g.r*(0.72+(j%4)*0.1)); const dl=bd+(j*0.012)%0.25; return { armStyle:'position:absolute;top:50%;left:50%;width:'+len+'px;height:2px;transform-origin:0 50%;transform:translateY(-50%) rotate('+ang+'deg)', lineStyle:'position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to right,'+g.c+','+g.tip+');transform-origin:0 50%;animation:fwexpand '+dur+'s ease-out '+dl+'s infinite', dotStyle:'position:absolute;top:50%;right:-2px;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:'+g.tip+';animation:fwexpand '+dur+'s ease-out '+dl+'s infinite' }; }); return { wrapStyle:'position:absolute;left:'+g.x+'%;top:'+g.y+'%;pointer-events:none', glowStyle:'position:absolute;top:0;left:0;width:'+Math.round(g.r*1.1)+'px;height:'+Math.round(g.r*1.1)+'px;border-radius:50%;background:radial-gradient('+g.tip+' 0%,'+g.c+' 35%,transparent 70%);transform:translate(-50%,-50%);animation:fwglow '+dur+'s ease-out '+bd+'s infinite', sparks }; }); })() : [];
 
     return {
       // screens
