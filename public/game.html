@@ -698,38 +698,36 @@ class Component extends DCLogic {
 
   // ---- audio ----
   ac(){ if(!this._ac){ try{ this._ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(this._ac && this._ac.state==='suspended') this._ac.resume(); return this._ac; }
-  playRight(){ const c=this.ac(); if(!c)return; const t=c.currentTime; [660,880,1320].forEach((f,i)=>{ const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f; const s=t+i*0.11; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.32,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.2); o.connect(g).connect(c.destination); o.start(s); o.stop(s+0.22); }); }
-  playWrong(){ const c=this.ac(); if(!c)return; const t=c.currentTime; const o=c.createOscillator(),g=c.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(70,t+0.5); g.gain.setValueAtTime(0.28,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.55); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.56); }
+  playRight(){ const c=this.ac(); if(!c)return; const doIt=()=>{ const t=c.currentTime; [660,880,1320].forEach((f,i)=>{ try{ const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f; const s=t+i*0.11; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.65,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.22); o.connect(g).connect(c.destination); o.start(s); o.stop(s+0.25); }catch(e){} }); }; if(c.state==='suspended') c.resume().then(doIt); else doIt(); }
+  playWrong(){ const c=this.ac(); if(!c)return; const doIt=()=>{ try{ const t=c.currentTime; const o=c.createOscillator(),g=c.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(60,t+0.5); g.gain.setValueAtTime(0.7,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.55); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.58); }catch(e){} }; if(c.state==='suspended') c.resume().then(doIt); else doIt(); }
 
   // ---- background music ----
-  _bgm = { sched:null, mode:null, step:0, next:0, out:null };
-  bgmNote(ctx,out,hz,t,dur,type,vol){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=hz; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+0.015); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.connect(g); g.connect(out); o.start(t); o.stop(t+dur+0.05); }
-  bgmKick(ctx,out,t){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(40,t+0.15); g.gain.setValueAtTime(0.7,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22); o.connect(g); g.connect(out); o.start(t); o.stop(t+0.28); }
-  bgmHat(ctx,out,t,v=0.1){ const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*0.06),ctx.sampleRate),d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain(); f.type='highpass';f.frequency.value=8000; g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.06); s.buffer=b; s.connect(f); f.connect(g); g.connect(out); s.start(t); }
-  startBGM(mode){ if(this._bgm.mode===mode) return; this.stopBGM(); const ctx=this.ac(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.75; out.connect(ctx.destination); this._bgm={...this._bgm,mode,step:0,next:ctx.currentTime+0.1,out}; this._bgmTick(); }
+  _bgm = { sched:null, mode:null, beat:0, out:null };
+  bgmNote(ctx,out,hz,t,dur,type,vol){ try{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=hz; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.connect(g); g.connect(out); o.start(t); o.stop(t+dur+0.05); }catch(e){} }
+  bgmKick(ctx,out,t){ try{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(35,t+0.18); g.gain.setValueAtTime(1.0,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25); o.connect(g); g.connect(out); o.start(t); o.stop(t+0.3); }catch(e){} }
+  bgmHat(ctx,out,t,v=0.18){ try{ const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*0.08),ctx.sampleRate),d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain(); f.type='highpass';f.frequency.value=7000; g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.08); s.buffer=b; s.connect(f); f.connect(g); g.connect(out); s.start(t); }catch(e){} }
+  startBGM(mode){ if(this._bgm.mode===mode) return; this.stopBGM(); const ctx=this.ac(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.85; out.connect(ctx.destination); this._bgm.mode=mode; this._bgm.beat=0; this._bgm.out=out; const spb=60/(mode==='play'?138:76); const doTick=()=>{ const tick=()=>{ try{ if(!this._bgm.mode||!this._bgm.out) return; const t=this.ac().currentTime+0.06; this._bgmStep(this.ac(),this._bgm.out,t,this._bgm.beat,spb); this._bgm.beat=(this._bgm.beat+1)%16; }catch(e){} if(this._bgm.mode) this._bgm.sched=setTimeout(tick,Math.round(spb*500)); }; tick(); }; if(ctx.state==='suspended') ctx.resume().then(doTick).catch(doTick); else doTick(); }
   stopBGM(){ if(this._bgm.sched){clearTimeout(this._bgm.sched);this._bgm.sched=null;} if(this._bgm.out){try{this._bgm.out.disconnect();}catch(e){} this._bgm.out=null;} this._bgm.mode=null; }
-  _bgmTick(){ const b=this._bgm,ctx=this.ac(),out=b.out; if(!ctx||!out||!b.mode)return; const spb=60/(b.mode==='play'?138:76); while(b.next<ctx.currentTime+0.35){this._bgmStep(ctx,out,b.next,b.step,spb);b.step=(b.step+1)%16;b.next+=spb*0.5;} b.sched=setTimeout(()=>this._bgmTick(),100); }
-  _bgmStep(ctx,out,t,step,spb){ const m=this._bgm.mode;
+  _bgmStep(ctx,out,t,beat,spb){ const m=this._bgm.mode;
     if(m==='play'){
-      if(step===0||step===8) this.bgmKick(ctx,out,t);
-      if(step%2===0) this.bgmHat(ctx,out,t,step%4===0?0.13:0.07);
+      if(beat%4===0) this.bgmKick(ctx,out,t);
+      if(beat%2===0) this.bgmHat(ctx,out,t,beat%4===0?0.2:0.12);
       const bass=[65,65,82,65,65,82,98,82,65,65,82,65,73,82,98,82];
-      this.bgmNote(ctx,out,bass[step]*0.5,t,spb*0.85,'sawtooth',0.18);
+      this.bgmNote(ctx,out,bass[beat]*0.5,t,spb*0.8,'sawtooth',0.22);
       const mel=[523,0,659,0,784,0,659,784,523,0,659,0,698,659,784,0];
-      if(mel[step]) this.bgmNote(ctx,out,mel[step],t,spb*0.42,'square',0.12);
-      if(mel[step]) this.bgmNote(ctx,out,mel[step]*0.5,t,spb*0.42,'triangle',0.07);
+      if(mel[beat]){ this.bgmNote(ctx,out,mel[beat],t,spb*0.4,'square',0.18); this.bgmNote(ctx,out,mel[beat]*0.5,t,spb*0.4,'triangle',0.09); }
     } else {
-      if(step===0||step===8) this.bgmKick(ctx,out,t);
-      if(step===4||step===12) this.bgmHat(ctx,out,t,0.07);
-      const ch=[[261,329,392],[349,440,523],[392,494,587],[349,440,523]][Math.floor(step/4)%4];
-      if(step%4===0) ch.forEach(f=>this.bgmNote(ctx,out,f,t,spb*1.85,'sine',0.10));
+      if(beat===0||beat===8) this.bgmKick(ctx,out,t);
+      if(beat===4||beat===12) this.bgmHat(ctx,out,t,0.12);
+      const ch=[[261,329,392],[349,440,523],[392,494,587],[349,440,523]][Math.floor(beat/4)%4];
+      if(beat%4===0) ch.forEach(f=>this.bgmNote(ctx,out,f,t,spb*1.8,'sine',0.15));
       const mel=[523,440,392,330,392,440,523,440,392,330,294,330,392,440,523,659];
-      if(step%2===0) this.bgmNote(ctx,out,mel[step%16],t,spb*0.65,'triangle',0.13);
+      if(beat%2===0) this.bgmNote(ctx,out,mel[beat%16],t,spb*0.6,'triangle',0.18);
       const bass=[131,131,131,131,175,175,175,175,196,196,196,196,175,175,175,175];
-      if(step%4===0) this.bgmNote(ctx,out,bass[step%16],t,spb*1.8,'sine',0.14);
+      if(beat%4===0) this.bgmNote(ctx,out,bass[beat%16],t,spb*1.75,'sine',0.20);
     }
   }
-  playFanfare(){ const ctx=this.ac(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.8; out.connect(ctx.destination); const t=ctx.currentTime; const seq=[[523,0],[659,0.12],[784,0.24],[1047,0.38],[784,0.72],[880,0.86],[1047,1.02],[1319,1.2]]; seq.forEach(([f,dt])=>{ this.bgmNote(ctx,out,f,t+dt,0.22,'sine',0.3); this.bgmNote(ctx,out,f*0.5,t+dt,0.28,'triangle',0.15); if(f>800) this.bgmNote(ctx,out,f*1.5,t+dt,0.15,'sine',0.1); }); setTimeout(()=>{try{out.disconnect();}catch(e){}},2800); }
+  playFanfare(){ const ctx=this.ac(); if(!ctx) return; const out=ctx.createGain(); out.gain.value=0.9; out.connect(ctx.destination); const t=ctx.currentTime; const seq=[[523,0],[659,0.12],[784,0.24],[1047,0.38],[784,0.72],[880,0.86],[1047,1.02],[1319,1.2]]; seq.forEach(([f,dt])=>{ this.bgmNote(ctx,out,f,t+dt,0.22,'sine',0.35); this.bgmNote(ctx,out,f*0.5,t+dt,0.28,'triangle',0.18); if(f>800) this.bgmNote(ctx,out,f*1.5,t+dt,0.15,'sine',0.12); }); setTimeout(()=>{try{out.disconnect();}catch(e){}},2800); }
 
   // ---- hint & zoom ----
   toggleHint(){ this.setState(s=>({ hintRevealed:!s.hintRevealed })); }
