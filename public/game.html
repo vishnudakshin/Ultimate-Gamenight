@@ -241,9 +241,30 @@ input:focus,textarea:focus{outline:none}
                       </div>
                     </sc-if>
                   </div>
-                  <sc-if value="{{ it.isChampKind }}">
+                  <sc-if value="{{ it.isChampQA }}">
+                    <div style="font:600 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#F4C95D;opacity:.7">Q + Reveal</div>
                     <textarea placeholder="Type the championship question…" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" rows="3" style="width:100%;resize:vertical;background:#0d0722;border:1px solid rgba(244,201,93,.3);border-radius:8px;color:#F4C95D;font:500 13px 'Poppins';padding:11px"></textarea>
                     <input placeholder="Answer (host reveals on command)" onChange="{{ it.onAnswer }}" value="{{ it.answer }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.25);border-radius:8px;color:#F4C95D;font:600 11px 'Poppins';padding:8px">
+                  </sc-if>
+                  <sc-if value="{{ it.isChampList }}">
+                    <div style="font:600 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#F4C95D;opacity:.7">5-Item List + Reveal</div>
+                    <div style="display:flex;flex-direction:column;gap:7px">
+                      <sc-for list="{{ it.listItems }}" as="li" hint-placeholder-count="5">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <span style="font:700 11px 'Poppins';color:#F4C95D;width:16px;text-align:right">{{ li.num }}</span>
+                          <input placeholder="List item {{ li.num }}" onChange="{{ li.onChange }}" value="{{ li.value }}" style="flex:1;background:#0d0722;border:1px solid rgba(244,201,93,.25);border-radius:8px;color:#F4C95D;font:600 11px 'Poppins';padding:8px">
+                        </div>
+                      </sc-for>
+                    </div>
+                    <input placeholder="Reveal answer (optional, shown on reveal)" onChange="{{ it.onAnswer }}" value="{{ it.answer }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.18);border-radius:8px;color:#F4C95D;font:500 11px 'Poppins';padding:8px">
+                  </sc-if>
+                  <sc-if value="{{ it.isChampCaption }}">
+                    <div style="font:600 9px 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:#F4C95D;opacity:.7">Caption This — image only, no reveal</div>
+                    <label style="{{ it.dropStyle }}">
+                      <sc-if value="{{ it.hasImage }}" hint-placeholder-val="{{ false }}"><div style="{{ it.imgBoxStyle }}"></div></sc-if>
+                      <sc-if value="{{ it.noImage }}"><i class="ti ti-photo-up" style="font-size:26px;color:#c4932a"></i><span style="font:600 9px monospace;color:#F4C95D">UPLOAD IMAGE</span></sc-if>
+                      <input type="file" accept="image/*" onChange="{{ it.onUpload }}" style="display:none">
+                    </label>
                   </sc-if>
                   <sc-if value="{{ it.isTriviaKind }}">
                     <textarea placeholder="Type the trivia question…" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" rows="2" style="width:100%;resize:vertical;background:#0d0722;border:1px solid rgba(192,132,252,.2);border-radius:8px;color:#F3E8FF;font:500 13px 'Poppins';padding:11px"></textarea>
@@ -349,36 +370,98 @@ input:focus,textarea:focus{outline:none}
   </div>
 </sc-if>
 
+<!-- ===================== SPIN WHEEL ===================== -->
+<sc-if value="{{ isSpin }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px 20px;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,rgba(124,58,237,.18) 0%,transparent 68%)">
+    <div style="text-align:center;line-height:1.2">
+      <div style="font:700 10px 'Poppins';letter-spacing:.3em;text-transform:uppercase;color:#C084FC;margin-bottom:6px">Game Night</div>
+      <div style="font:400 clamp(30px,6vw,54px) 'Anton';color:#F4C95D;letter-spacing:.02em">Who goes first?</div>
+    </div>
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+      <div style="width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid #F4C95D;filter:drop-shadow(0 2px 10px rgba(244,201,93,.7));z-index:2;margin-bottom:-6px"></div>
+      <canvas id="spin-wheel" width="300" height="300" style="display:block;border-radius:50%;box-shadow:0 0 48px rgba(0,0,0,.6),0 0 0 3px rgba(244,201,93,.35)"></canvas>
+    </div>
+    <sc-if value="{{ spinHasResult }}">
+      <div style="text-align:center">
+        <div style="font:700 10px 'Poppins';letter-spacing:.22em;text-transform:uppercase;color:#8f74c4;margin-bottom:4px">First up</div>
+        <div style="font:400 clamp(34px,7vw,58px) 'Anton';color:#F4C95D;text-shadow:0 0 32px rgba(244,201,93,.55);line-height:1">{{ spinWinner }}</div>
+        <div style="font:600 12px 'Poppins';color:#C084FC;margin-top:2px">goes first!</div>
+      </div>
+      <button onClick="{{ beginGame }}" style="background:linear-gradient(90deg,#F4C95D,#e0a83a);color:#1a0b2e;border:none;border-radius:14px;padding:14px 44px;font:800 15px 'Poppins';cursor:pointer;box-shadow:0 0 28px rgba(244,201,93,.45);letter-spacing:.03em">Let's Play! →</button>
+    </sc-if>
+    <sc-if value="{{ showSpinBtn }}">
+      <button onClick="{{ spinWheel }}" style="background:linear-gradient(135deg,#7C3AED,#5b23c9);color:#fff;border:none;border-radius:14px;padding:16px 52px;font:800 16px 'Poppins';cursor:pointer;box-shadow:0 0 32px rgba(124,58,237,.55);letter-spacing:.04em">SPIN THE WHEEL</button>
+    </sc-if>
+    <sc-if value="{{ spinning }}">
+      <div style="font:600 13px 'Poppins';color:#8f74c4;letter-spacing:.08em;animation:pulse 1s ease-in-out infinite">spinning…</div>
+    </sc-if>
+  </div>
+</sc-if>
+
 <!-- ===================== BOARD (pick a topic) ===================== -->
 <sc-if value="{{ isBoard }}">
   <div class="gn-scroll" style="position:relative;height:100%;overflow-y:auto;padding:26px 30px 60px">
     <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.05) 50%,transparent 58%);animation:sweep 9s ease-in-out infinite;pointer-events:none"></div>
     <button onClick="{{ goToPlayers }}" style="position:absolute;left:30px;top:26px;z-index:5;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.4);color:#c9b6ee;font:700 12px 'Poppins';border-radius:999px;padding:9px 16px;cursor:pointer"><i class="ti ti-arrow-left" style="font-size:14px"></i>Players</button>
     <div style="position:relative;text-align:center;margin-bottom:10px">
-      <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">Pick a topic</div>
+      <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">{{ boardPhaseLabel }}</div>
       <div style="font:400 clamp(26px,4vw,42px) 'Anton';color:#F4C95D;letter-spacing:.02em">{{ pickerName }}'S TURN</div>
     </div>
-    <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;max-width:1100px;margin:20px auto 0">
+    <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1100px;margin:20px auto 0">
       <sc-for list="{{ boardCats }}" as="bc" hint-placeholder-count="4">
-        <div style="{{ bc.boxStyle }}">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <div style="width:38px;height:38px;border-radius:11px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.2);display:flex;align-items:center;justify-content:center;flex:none"><i class="ti {{ bc.icon }}" style="font-size:19px;color:#F4C95D"></i></div>
+        <div onClick="{{ bc.onSelect }}" style="{{ bc.boxStyle }}">
+          <!-- header row: icon + name always visible -->
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:34px;height:34px;border-radius:10px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.18);display:flex;align-items:center;justify-content:center;flex:none"><i class="ti {{ bc.icon }}" style="font-size:17px;color:#F4C95D"></i></div>
             <div style="min-width:0;flex:1">
               <div style="font:800 13px 'Poppins';color:#fff2cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ bc.punTitle }}</div>
-              <div style="font:500 10px 'Poppins';color:#8f74c4;margin-top:1px">{{ bc.remaining }} left · +{{ bc.points }} pts</div>
-              <sc-if value="{{ bc.isChampCat }}"><div style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;background:rgba(244,201,93,.15);border:1px solid rgba(244,201,93,.45);border-radius:5px;padding:2px 7px"><i class="ti ti-crown" style="font-size:9px;color:#F4C95D"></i><span style="font:700 8px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#F4C95D">Final Round</span></div></sc-if>
+              <sc-if value="{{ bc.isChampCat }}"><div style="display:inline-flex;align-items:center;gap:3px;margin-top:3px;background:rgba(244,201,93,.15);border:1px solid rgba(244,201,93,.45);border-radius:5px;padding:2px 6px"><i class="ti ti-crown" style="font-size:8px;color:#F4C95D"></i><span style="font:700 7px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#F4C95D">Final Round</span></div></sc-if>
             </div>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:7px">
-            <sc-for list="{{ bc.qButtons }}" as="qb" hint-placeholder-count="6">
-              <button onClick="{{ qb.onClick }}" disabled="{{ qb.disabled }}" style="{{ qb.style }}">{{ qb.label }}</button>
-            </sc-for>
-          </div>
+          <!-- expanded: question buttons (only when this cat is active) -->
+          <sc-if value="{{ bc.showQButtons }}">
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(244,201,93,.15)">
+              <sc-if value="{{ bc.showAllDone }}">
+                <div style="display:flex;align-items:center;gap:8px;color:#8EF0A8;font:700 11px 'Poppins'"><i class="ti ti-circle-check" style="font-size:15px"></i>All questions done!</div>
+              </sc-if>
+              <sc-if value="{{ bc.showQButtons }}">
+                <div style="font:600 9px 'Poppins';color:#8f74c4;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">{{ bc.remaining }} question{{ bc.remaining === 1 ? '' : 's' }} left</div>
+                <div style="display:flex;flex-wrap:wrap;gap:7px">
+                  <sc-for list="{{ bc.qButtons }}" as="qb" hint-placeholder-count="5">
+                    <button onClick="{{ qb.onClick }}" disabled="{{ qb.disabled }}" style="{{ qb.style }}">{{ qb.label }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
         </div>
       </sc-for>
     </div>
     <div style="position:relative;display:flex;justify-content:center;margin-top:30px">
       <button onClick="{{ endGame }}" style="display:flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(244,201,93,.4);color:#F4C95D;font:700 12px 'Poppins';border-radius:999px;padding:11px 22px;cursor:pointer"><i class="ti ti-trophy" style="font-size:15px"></i>Standings</button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ===================== PICK NEXT ===================== -->
+<sc-if value="{{ isPickNext }}">
+  <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:30px 24px;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(94,240,168,.12) 0%,transparent 65%);pointer-events:none"></div>
+    <div style="text-align:center">
+      <div style="font:700 10px 'Poppins';letter-spacing:.3em;text-transform:uppercase;color:#8EF0A8;margin-bottom:6px">Category complete!</div>
+      <div style="font:400 clamp(26px,5vw,48px) 'Anton';color:#F4C95D;letter-spacing:.02em;line-height:1">Who picks next?</div>
+      <div style="font:500 12px 'Poppins';color:#8f74c4;margin-top:6px">Tap a player or team to give them the next pick</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:680px">
+      <sc-for list="{{ pickNextPlayers }}" as="pn" hint-placeholder-count="4">
+        <div onClick="{{ pn.onPick }}" style="{{ pn.cardStyle }}">
+          <div style="width:44px;height:44px;border-radius:12px;background:{{ pn.color }};color:#1a0b2e;font:400 18px 'Anton';display:flex;align-items:center;justify-content:center">{{ pn.initials }}</div>
+          <div>
+            <div style="font:800 14px 'Poppins';color:#F3E8FF">{{ pn.name }}</div>
+            <div style="font:400 18px 'Anton';color:#F4C95D">{{ pn.score }} pts</div>
+          </div>
+        </div>
+      </sc-for>
     </div>
   </div>
 </sc-if>
@@ -437,10 +520,34 @@ input:focus,textarea:focus{outline:none}
               <sc-if value="{{ notRevealed }}"><button onClick="{{ reveal }}" style="display:flex;align-items:center;gap:9px;background:#7C3AED;color:#fff;font:700 13px 'Poppins';border:none;border-radius:12px;padding:11px 24px;cursor:pointer;box-shadow:0 0 20px rgba(124,58,237,.5)"><i class="ti ti-eye" style="font-size:16px"></i>Reveal answer</button></sc-if>
             </div>
           </sc-if>
-          <sc-if value="{{ showChampBlock }}">
+          <sc-if value="{{ showChampQA }}">
             <div style="padding:32px;display:flex;flex-direction:column;gap:14px;width:100%;height:100%;align-items:center;justify-content:center">
               <div style="font:700 8px 'Poppins';letter-spacing:.3em;text-transform:uppercase;color:#F4C95D">⚡ Lightning Buzzer Round</div>
               <div style="font:400 clamp(24px,3.5vw,48px) 'Anton';color:#F3E8FF;text-align:center;text-wrap:balance;letter-spacing:.02em;line-height:1.15">{{ curPrompt }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showChampList }}">
+            <div style="padding:24px 32px;display:flex;flex-direction:column;gap:12px;width:100%;height:100%;align-items:center;justify-content:center">
+              <div style="font:700 8px 'Poppins';letter-spacing:.3em;text-transform:uppercase;color:#F4C95D;margin-bottom:4px">⚡ Lightning Buzzer Round</div>
+              <div style="display:flex;flex-direction:column;gap:9px;width:100%;max-width:500px">
+                <sc-for list="{{ champListItems }}" as="cl" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,rgba(244,201,93,.1),rgba(244,201,93,.04));border:1px solid rgba(244,201,93,.3);border-radius:12px;padding:12px 18px">
+                    <span style="font:700 16px 'Anton';color:#F4C95D;width:22px;text-align:center">{{ cl.num }}</span>
+                    <span style="font:600 clamp(14px,1.8vw,20px) 'Poppins';color:#F3E8FF">{{ cl.text }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showChampCaption }}">
+            <div style="display:flex;flex-direction:column;width:100%;height:100%">
+              <div style="flex:1;min-height:0;position:relative">
+                <sc-if value="{{ noChampCaptionImage }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 13px 'Poppins';color:#8f74c4">No image uploaded</div></sc-if>
+                <div style="{{ champCaptionImgStyle }}"></div>
+              </div>
+              <div style="flex:none;padding:14px;text-align:center;background:rgba(10,6,20,.7)">
+                <div style="font:400 clamp(18px,3vw,30px) 'Anton';color:#F4C95D;letter-spacing:.06em">Caption this</div>
+              </div>
             </div>
           </sc-if>
           <sc-if value="{{ showConnPuzzle }}">
@@ -655,19 +762,23 @@ class Component extends DCLogic {
     const defs = [
       { id:'geo', name:'Guess the Location', icon:'ti-world', tag:'GEO', kind:'imagequiz', questions:5, timer:30, points:10, on:true },
       { id:'logo', name:'Guess the Logo', icon:'ti-building-store', tag:'LOGO', kind:'image', questions:8, timer:15, points:10, on:true },
-      { id:'flag', name:'Guess the Flag', icon:'ti-flag', tag:'FLAG', kind:'image', questions:8, timer:15, points:10, on:false },
+      { id:'flag', name:'Guess the Flag', icon:'ti-flag', tag:'FLAG', kind:'imagequiz', questions:8, timer:15, points:10, on:false },
       { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'imagequiz', questions:6, timer:20, points:10, on:false },
       { id:'wordle', name:'Wordle', icon:'ti-square-letter-w', tag:'WORD', kind:'wordle', questions:3, timer:60, points:5, on:false },
       { id:'conn', name:'Connections', icon:'ti-grid-dots', tag:'CONN', kind:'grid', questions:2, timer:180, points:8, on:true },
       { id:'bee', name:'Spelling Bee', icon:'ti-hexagon', tag:'BEE', kind:'bee', questions:3, timer:90, points:5, on:false },
       { id:'rebus', name:'Rebus Puzzles', icon:'ti-puzzle', tag:'REBUS', kind:'image', questions:6, timer:20, points:8, on:false },
       { id:'trivia', name:'Trivia', icon:'ti-bulb', tag:'TRIV', kind:'trivia', questions:10, timer:20, points:5, on:true },
-      { id:'champ', name:'Championship Round', icon:'ti-crown', tag:'CHAMP', kind:'championship', questions:5, timer:45, points:20, on:false },
+      { id:'champ', name:'Championship Round', icon:'ti-crown', tag:'CHAMP', kind:'championship', questions:3, timer:45, points:20, on:false },
     ];
     return defs.map(d => ({ ...d, items: this.mkItems(d.kind, d.questions) }));
   }
   mkItems(kind, n) {
-    if (kind==='championship') return Array.from({ length:n }, () => ({ prompt:'', answer:'', hint:'', points:20 }));
+    if (kind==='championship') return [
+      { champType:'qa',      prompt:'', answer:'', hint:'', points:20 },
+      { champType:'list',    listItems:['','','','',''], answer:'', hint:'', points:20 },
+      { champType:'caption', image:null, hint:'', points:20 },
+    ];
     if (kind==='imagequiz') return Array.from({ length:n }, () => ({ image:null, prompt:'', answer:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), hint:'', points:10 }));
     if (kind==='trivia') return Array.from({ length:n }, () => ({ prompt:'', options:[0,1,2,3].map(()=>({text:'',correct:false})), hint:'', points:10 }));
     if (kind==='grid') return Array.from({ length:n }, () => ({ groups:[0,1,2,3].map(()=>({ name:'', words:['','','',''] })), hint:'', points:8 }));
@@ -684,15 +795,18 @@ class Component extends DCLogic {
     cats:this.buildCats(), players:this.buildPlayers(),
     contentId:'geo',
     curCatId:null, curQIdx:0, timeLeft:0, running:false, revealed:false, lastResult:0, flash:null,
-    answered:{}, pickerIdx:0, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null,
+    answered:{}, pickerIdx:0, activeCatId:null, showConnAnswer:false, conn:null, wordle:null, bee:null, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null,
+    spinning:false, spinResult:null,
     saves:[], showSaveDialog:false, saveNameDraft:'',
   };
 
+  _wheelAngle = 0; _spinWinIdx = null; _wheelAF = null;
   _yt = null; _ytReady = false;
   YT_HOME = '-Z0LT59hKHM'; YT_QUIZ = 'TyQs5GxkV40'; YT_WIN = '2kbf_Y6taTI';
   YT_SILENT_KINDS = new Set(['wordle','grid','bee','championship']);
   componentDidMount(){ this.setState({ saves:this.loadSavesFromStorage() }); this._kd=(e)=>this.onKeyDown(e); window.addEventListener('keydown', this._kd); this._initYT(); this._genIcon(); }
-  componentWillUnmount(){ this.stopTimer(); this.stopBGM(); if(this._kd) window.removeEventListener('keydown', this._kd); if(this._yt){try{this._yt.destroy();}catch(e){} this._yt=null;} }
+  componentWillUnmount(){ this.stopTimer(); this.stopBGM(); if(this._kd) window.removeEventListener('keydown', this._kd); if(this._yt){try{this._yt.destroy();}catch(e){} this._yt=null;} if(this._wheelAF){cancelAnimationFrame(this._wheelAF);this._wheelAF=null;} }
+  componentDidUpdate(){ if(this.state.screen==='spin'&&!this._wheelAF) this._drawWheel(); }
   _ytUnlocked = false; _currentVid = null;
   _initYT(){ const init=()=>{ if(!window.YT||!window.YT.Player||!document.getElementById('yt-player')) return; this._yt=new window.YT.Player('yt-player',{ playerVars:{autoplay:1,controls:0,disablekb:1,modestbranding:1,rel:0,iv_load_policy:3,origin:window.location.origin}, events:{onReady:()=>{ this._ytReady=true; this.ytSwitch(this.YT_HOME); const unlock=()=>{ if(!this._ytUnlocked){this._ytUnlocked=true; if(this.state.screen==='home') this.ytSwitch(this.YT_HOME);} }; document.addEventListener('click',unlock,{once:true}); document.addEventListener('touchstart',unlock,{once:true,passive:true}); }, onStateChange:(e)=>{ if(e.data===1) this._ytUnlocked=true; if(e.data===0&&this._yt&&this._currentVid!==this.YT_QUIZ) try{this._yt.seekTo(0);this._yt.playVideo();}catch(ex){} }} }); }; const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{if(prev)prev();init();}; if(window.YT&&window.YT.Player)init(); }
   _genIcon(){ try{ const c=document.createElement('canvas'); c.width=180;c.height=180; const cx=c.getContext('2d'); cx.fillStyle='#1a0b2e'; if(cx.roundRect){cx.beginPath();cx.roundRect(0,0,180,180,36);cx.fill();}else{cx.fillRect(0,0,180,180);} cx.fillStyle='#F4C95D'; cx.beginPath();cx.moveTo(26,125);cx.lineTo(26,70);cx.lineTo(55,92);cx.lineTo(90,40);cx.lineTo(125,92);cx.lineTo(154,70);cx.lineTo(154,125);cx.closePath();cx.fill(); if(cx.roundRect){cx.beginPath();cx.roundRect(26,120,128,32,8);cx.fill();}else cx.fillRect(26,120,128,32); cx.fillStyle='#C084FC'; if(cx.roundRect){cx.beginPath();cx.roundRect(26,136,128,16,6);cx.fill();}else cx.fillRect(26,136,128,16); cx.fillStyle='#1a0b2e'; [[90,48,9],[55,92,6],[125,92,6]].forEach(([x,y,r])=>{cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();}); const url=c.toDataURL('image/png'); let l=document.querySelector('link[rel="apple-touch-icon"]'); if(!l){l=document.createElement('link');l.rel='apple-touch-icon';document.head.appendChild(l);} l.href=url; }catch(e){} }
@@ -785,25 +899,29 @@ class Component extends DCLogic {
   toggleTeams(){ this.setState(s=>({ useTeams:!s.useTeams })); }
 
   // ---- wizard nav ----
-  goHome(){ this.ytSwitch(this.YT_HOME); this.stopTimer(); this.stopBGM(); this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  goHome(){ this.ytSwitch(this.YT_HOME); this.stopTimer(); this.stopBGM(); if(this._wheelAF){cancelAnimationFrame(this._wheelAF);this._wheelAF=null;} this.setState({ screen:'home', step:1, curCatId:null, curQIdx:0, answered:{}, pickerIdx:0, activeCatId:null, showConnAnswer:false, revealed:false, running:false, showSaveDialog:false, spinning:false, spinResult:null, cats:this.state.cats.map(c=>({...c})), players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
   goSetup(){ this.ytStop(); this.setState({ screen:'setup', step:1 }); }
   nextStep(){ const st=this.state.step; if(st<3){ let ns=st+1; if(ns===2 && !this.activeCats().some(c=>c.id===this.state.contentId)) { const a=this.activeCats(); if(a[0]) this.setState({contentId:a[0].id}); } this.setState({step:ns}); } else { this.startGame(); } }
   prevStep(){ const st=this.state.step; if(st>1) this.setState({step:st-1}); else this.goHome(); }
 
   // ---- play ----
-  startGame(){ this.ytStop(); this.setState({ screen:'board', answered:{}, pickerIdx:0, players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  startGame(){ this.ytStop(); this._wheelAngle=0; this.setState({ screen:'spin', answered:{}, pickerIdx:0, spinning:false, spinResult:null, players:this.state.players.map(p=>({...p,score:p.startScore||0})) }); }
+  _drawWheel(){ const canvas=document.getElementById('spin-wheel'); if(!canvas) return; const ctx=canvas.getContext('2d'); const R=130,cx=150,cy=150; ctx.clearRect(0,0,300,300); const pl=this.state.players; const n=pl.length; if(!n) return; const rot=this._wheelAngle*Math.PI/180; for(let i=0;i<n;i++){ const a0=rot+(i/n)*Math.PI*2-Math.PI/2; const a1=rot+((i+1)/n)*Math.PI*2-Math.PI/2; ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a0,a1);ctx.closePath(); ctx.fillStyle=pl[i].color;ctx.fill(); ctx.strokeStyle='rgba(10,6,20,.25)';ctx.lineWidth=1.5;ctx.stroke(); } for(let i=0;i<n;i++){ const mid=rot+((i+0.5)/n)*Math.PI*2-Math.PI/2; const tx=cx+R*0.62*Math.cos(mid); const ty=cy+R*0.62*Math.sin(mid); ctx.save();ctx.translate(tx,ty);ctx.rotate(mid+Math.PI/2); ctx.fillStyle='rgba(0,0,0,.55)';ctx.font='bold 13px Poppins,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle'; ctx.fillText(this.ini(pl[i].name),0,0); ctx.restore(); } ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.strokeStyle='rgba(244,201,93,.7)';ctx.lineWidth=3;ctx.stroke(); ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fillStyle='#0d0722';ctx.fill();ctx.strokeStyle='rgba(244,201,93,.5)';ctx.lineWidth=2;ctx.stroke(); ctx.fillStyle='#F4C95D';ctx.font='16px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',cx,cy); }
+  spinWheel(){ if(this.state.spinning||this.state.spinResult!=null) return; const pl=this.state.players; const n=pl.length; if(!n) return; const winIdx=Math.floor(Math.random()*n); this._spinWinIdx=winIdx; const segMid=((winIdx+0.5)/n)*360; const landAngle=(360-segMid+360)%360; const currMod=((this._wheelAngle%360)+360)%360; const diff=(landAngle-currMod+360)%360; const target=this._wheelAngle+(5+Math.floor(Math.random()*4))*360+diff; const startA=this._wheelAngle; const t0=Date.now(); const dur=4000; this.setState({spinning:true}); if(this._wheelAF){cancelAnimationFrame(this._wheelAF);this._wheelAF=null;} const tick=()=>{ const p=Math.min((Date.now()-t0)/dur,1); const e=1-Math.pow(1-p,4); this._wheelAngle=startA+(target-startA)*e; this._drawWheel(); if(p<1){this._wheelAF=requestAnimationFrame(tick);}else{this._wheelAF=null;this._wheelAngle=target;this._drawWheel();setTimeout(()=>this.setState({spinning:false,spinResult:winIdx}),200);} }; this._wheelAF=requestAnimationFrame(tick); }
+  beginGame(){ const wi=this.state.spinResult; this.ytStop(); this.setState({screen:'board',pickerIdx:wi!=null?wi:0,activeCatId:null,answered:{}}); }
   curCat(){ return this.state.cats.find(c=>c.id===this.state.curCatId); }
   curItem(){ const c=this.curCat(); return c ? c.items[this.state.curQIdx] : null; }
   pickQuestion(catId, idx){ const cat=this.state.cats.find(c=>c.id===catId); if(cat && this.YT_SILENT_KINDS.has(cat.kind)){ this.ytStop(); } else { this.ytSwitch(this.YT_QUIZ); } this.stopTimer(); const timerVal=cat?cat.timer:0; const conn=(cat&&cat.kind==='grid')?this.initConn(cat.items[idx]):null; const wordle=(cat&&cat.kind==='wordle')?{guesses:[],current:'',done:false,win:false,msg:''}:null; const bee=(cat&&cat.kind==='bee')?this.initBee(cat.items[idx]):null; this.setState({ screen:'play', curCatId:catId, curQIdx:idx, timeLeft:timerVal, running:timerVal>0, revealed:false, showConnAnswer:false, conn, wordle, bee, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null }); if(timerVal>0){ this._iv=setInterval(()=>{ this.setState(s=>{ if(s.timeLeft<=1){ this.stopTimer(); this.playWrong(); return {timeLeft:0,running:false}; } return {timeLeft:s.timeLeft-1}; }); },1000); } }
+  selectActiveCat(id){ if(this.state.activeCatId) return; this.setState({activeCatId:id}); }
+  chooseNextPicker(idx){ this.setState({screen:'board', pickerIdx:idx, activeCatId:null}); }
   backToBoard(){
     const cat=this.curCat();
-    this.stopTimer();
-    this.stopBGM();
-    this.ytStop();
+    this.stopTimer(); this.stopBGM(); this.ytStop();
     this.setState(s=>{
       const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
-      const pickerIdx = s.players.length ? (s.pickerIdx+1)%s.players.length : 0;
-      return { screen:'board', answered, pickerIdx, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null };
+      const activeCat = s.cats.find(c=>c.id===s.activeCatId);
+      const catAllDone = activeCat ? activeCat.items.every((_,i)=>!!answered[activeCat.id+'_'+i]) : false;
+      return { screen: catAllDone ? 'pickNext' : 'board', answered, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null };
     });
   }
   reveal(){
@@ -858,7 +976,7 @@ class Component extends DCLogic {
     const s = this.state;
     const isSetup = s.screen==='setup';
     const active = this.activeCats();
-    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='championship' ? 'q+reveal' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : k==='imagequiz' ? 'image+quiz' : 'image';
+    const kindLabelOf = k => k==='trivia' ? 'multiple-choice' : k==='championship' ? '3-part final' : k==='grid' ? 'connections' : k==='wordle' ? 'wordle' : k==='bee' ? 'spelling bee' : k==='imagequiz' ? 'image+quiz' : 'image';
 
     // setup step 1 cats
     const setupCats = s.cats.map(c=>{
@@ -884,7 +1002,7 @@ class Component extends DCLogic {
     // content rail
     const railSel = s.contentId;
     const contentRail = active.map(c=>{
-      const filled = c.items.filter(it=> c.kind==='championship' ? (!!it.prompt && !!it.answer) : c.kind==='imagequiz' ? (!!it.image && it.options && it.options.some(o=>o.correct) && it.options.every(o=>o.text)) : c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? ([...new Set((it.word||'').toUpperCase().replace(/[^A-Z]/g,''))].length>=7 && !!it.center && (it.word||'').toUpperCase().includes((it.center||'').toUpperCase())) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
+      const filled = c.items.filter(it=> c.kind==='championship' ? (it.champType==='caption'?!!it.image:it.champType==='list'?(it.listItems&&it.listItems.some(l=>!!l)):(!!it.prompt&&!!it.answer)) : c.kind==='imagequiz' ? (!!it.image && it.options && it.options.some(o=>o.correct) && it.options.every(o=>o.text)) : c.kind==='image' ? !!it.image : c.kind==='trivia' ? (it.prompt && it.options.every(o=>o.text) && it.options.some(o=>o.correct)) : c.kind==='wordle' ? (!!it.word && it.word.replace(/[^A-Za-z]/g,'').length>=2) : c.kind==='bee' ? ([...new Set((it.word||'').toUpperCase().replace(/[^A-Z]/g,''))].length>=7 && !!it.center && (it.word||'').toUpperCase().includes((it.center||'').toUpperCase())) : (it.groups && it.groups.every(g=>g.name && g.words.every(w=>w)))).length;
       const done = filled>=c.questions && c.questions>0;
       const sel = c.id===railSel;
       return { ...c, sel,
@@ -898,7 +1016,7 @@ class Component extends DCLogic {
       };
     });
     const selCat = s.cats.find(c=>c.id===railSel) || active[0] || s.cats[0];
-    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='championship' ? 'Type each final-round question and its answer — the host reveals the answer on command.' : selCat.kind==='imagequiz' ? 'Upload an image per question and provide 4 answer choices — mark the correct one.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter 7 unique letters (the hive — not necessarily a word) and the center letter. Players form 4+ letter words. Any word using all 7 letters is a pangram.' : 'Drop in one image per question and type the correct answer.') : '';
+    const selHint = selCat ? (selCat.kind==='trivia' ? 'Type each question and 4 answer options, then mark which one is correct.' : selCat.kind==='championship' ? 'Three fixed rounds — Q+Reveal (question & answer), List (5 stacked items + reveal), and Caption This (image, no reveal).' : selCat.kind==='imagequiz' ? 'Upload an image per question and provide 4 answer choices — mark the correct one.' : selCat.kind==='grid' ? 'Set up 4 groups of 4. Name each group and type its four words — players solve it as a Connections grid.' : selCat.kind==='wordle' ? 'Type the secret word for each round. Players guess it in 6 tries.' : selCat.kind==='bee' ? 'Enter 7 unique letters (the hive — not necessarily a word) and the center letter. Players form 4+ letter words. Any word using all 7 letters is a pangram.' : 'Drop in one image per question and type the correct answer.') : '';
 
     const contentItems = selCat ? selCat.items.map((it,idx)=>{
       const isImageKind = selCat.kind==='image';
@@ -913,7 +1031,7 @@ class Component extends DCLogic {
       if(isImageKind){
         const hasImage = !!it.image;
         return { ...base, hasImage, noImage: !it.image, answer:it.answer,
-          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:cover;background-position:center;background-image:url('+JSON.stringify(it.image||'')+')',
+          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:contain;background-color:#0d0722;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(it.image||'')+')',
           dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
           onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
           onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
@@ -929,7 +1047,7 @@ class Component extends DCLogic {
           onText:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.options=x.options.map((op,j)=>j===oi?{...op,text:ev.target.value}:op); return x; }),
         }));
         return { ...base, hasImage, noImage: !it.image,
-          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:cover;background-position:center;background-image:url('+JSON.stringify(it.image||'')+')',
+          imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:contain;background-color:#0d0722;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(it.image||'')+')',
           dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
           onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
           prompt: it.prompt||'', onPrompt:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.prompt=ev.target.value; return x; }),
@@ -937,9 +1055,22 @@ class Component extends DCLogic {
         };
       }
       if(isChampKind){
-        return { ...base, prompt:it.prompt||'', answer:it.answer||'',
+        const ct = it.champType||'qa';
+        const hasImage = !!it.image;
+        const listItems = (it.listItems||['','','','','']).map((v,li)=>({
+          value:v, num:li+1,
+          onChange:(ev)=>this.patchItem(selCat.id, idx, x=>{ const a=[...(x.listItems||['','','','',''])]; a[li]=ev.target.value; x.listItems=a; return x; }),
+        }));
+        return { ...base, champType:ct,
+          isChampQA: ct==='qa', isChampList: ct==='list', isChampCaption: ct==='caption',
+          prompt:it.prompt||'', answer:it.answer||'',
           onPrompt:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.prompt=ev.target.value; return x; }),
           onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
+          listItems,
+          hasImage, noImage:!hasImage,
+          imgBoxStyle:'width:100%;height:130px;border-radius:8px;background-size:contain;background-color:#0d0722;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(it.image||'')+')',
+          dropStyle:'cursor:pointer;border:1px dashed rgba(244,201,93,.4);border-radius:10px;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
+          onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
         };
       }
       if(isTriviaKind){
@@ -997,10 +1128,16 @@ class Component extends DCLogic {
     const curPicker = s.players.length ? (s.players[s.pickerIdx % s.players.length] || s.players[0]) : null;
     const pickerName = curPicker ? curPicker.name : '—';
     const curPickerColor = curPicker ? curPicker.color : '#C084FC';
+    const activeCatId = s.activeCatId;
     const boardCats = active.map(bc=>{
       const remaining = bc.questions - bc.items.reduce((a,_,i)=> a + (s.answered[bc.id+'_'+i]?1:0), 0);
       const allDone = remaining===0;
-      const qButtons = Array.from({length:bc.questions},(_,i)=>{
+      const isActive = bc.id === activeCatId;
+      const isLocked = !!activeCatId && !isActive;
+      const isChampCat = bc.kind==='championship';
+      const showQButtons = isActive;
+      const showAllDone = isActive && allDone;
+      const qButtons = isActive ? Array.from({length:bc.questions},(_,i)=>{
         const done = !!s.answered[bc.id+'_'+i];
         return { label:String(i+1), disabled:done,
           onClick: done ? (()=>{}) : (()=>this.pickQuestion(bc.id,i)),
@@ -1008,14 +1145,25 @@ class Component extends DCLogic {
             ? 'width:44px;height:44px;border-radius:9px;background:rgba(192,132,252,.05);border:1px solid rgba(192,132,252,.1);color:#3a2a5c;font:700 14px Poppins;cursor:default;pointer-events:none'
             : 'width:44px;height:44px;border-radius:9px;background:linear-gradient(160deg,rgba(244,201,93,.18),rgba(244,201,93,.06));border:1.5px solid rgba(244,201,93,.8);color:#F4C95D;font:700 14px Poppins;cursor:pointer;box-shadow:0 2px 10px rgba(244,201,93,.18),inset 0 1px 0 rgba(255,255,255,.1)',
         };
-      });
-      const isChampCat = bc.kind==='championship';
-      const boxStyle = allDone
-        ? 'background:#0d0722;border:1px solid rgba(192,132,252,.07);border-radius:16px;padding:18px;opacity:.3;pointer-events:none'
-        : isChampCat
+      }) : [];
+      const onSelect = (!activeCatId && !allDone) ? (()=>this.selectActiveCat(bc.id)) : (()=>{});
+      // box style
+      let boxStyle;
+      if (allDone) {
+        boxStyle = 'background:#0d0722;border:1px solid rgba(192,132,252,.07);border-radius:16px;padding:16px;opacity:.3;pointer-events:none';
+      } else if (isActive) {
+        boxStyle = isChampCat
           ? 'background:linear-gradient(145deg,rgba(58,38,4,.96),rgba(36,24,2,.98));border:2px solid #F4C95D;border-radius:16px;padding:18px;box-shadow:0 0 32px rgba(244,201,93,.22),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,217,80,.18)'
-          : 'background:linear-gradient(145deg,rgba(30,16,64,.92),rgba(21,12,48,.96));border:1px solid rgba(244,201,93,.28);border-radius:16px;padding:18px;box-shadow:0 4px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)';
-      return { ...bc, punTitle:this.PUNS[bc.id]||bc.name, remaining, allDone, isChampCat, qButtons, boxStyle };
+          : 'background:linear-gradient(145deg,rgba(30,16,64,.92),rgba(21,12,48,.96));border:1.5px solid rgba(244,201,93,.55);border-radius:16px;padding:18px;box-shadow:0 0 24px rgba(244,201,93,.15),0 4px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)';
+      } else if (isLocked) {
+        boxStyle = 'background:rgba(13,7,34,.5);border:1px solid rgba(192,132,252,.08);border-radius:16px;padding:16px;opacity:.35;pointer-events:none';
+      } else {
+        // phase 1 — compact, clickable
+        boxStyle = isChampCat
+          ? 'background:linear-gradient(145deg,rgba(58,38,4,.92),rgba(36,24,2,.95));border:2px solid rgba(244,201,93,.7);border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 0 20px rgba(244,201,93,.15),0 3px 14px rgba(0,0,0,.4)'
+          : 'background:linear-gradient(145deg,rgba(30,16,64,.88),rgba(21,12,48,.92));border:1px solid rgba(244,201,93,.22);border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)';
+      }
+      return { ...bc, punTitle:this.PUNS[bc.id]||bc.name, remaining, allDone, isActive, isLocked, isChampCat, showQButtons, showAllDone, qButtons, boxStyle, onSelect };
     });
 
     // play
@@ -1032,9 +1180,11 @@ class Component extends DCLogic {
     const isConnQ = !!cat && cat.kind==='grid';
     const isWordleQ = !!cat && cat.kind==='wordle';
     const isBeeQ = !!cat && cat.kind==='bee';
-    const curImage = ((isImageQ || isImageQuizQ) && item) ? item.image : null;
+    const curImage = ((isImageQ || isImageQuizQ || (isChampQ && item && item.champType==='caption')) && item) ? item.image : null;
     const curHint = (item && item.hint) ? item.hint : '';
-    const curPrompt = ((isTriviaQ || isChampQ) && item) ? (item.prompt||'(No question typed yet)') : '';
+    const curPrompt = ((isTriviaQ || (isChampQ && item && item.champType==='qa')) && item) ? (item.prompt||'(No question typed yet)') : '';
+    const champType = (isChampQ && item) ? (item.champType||'qa') : null;
+    const champListItems = (isChampQ && item && item.champType==='list') ? (item.listItems||['','','','','']).map((t,i)=>({num:i+1,text:t||'—'})) : [];
     const imageQuizOptions = (isImageQuizQ && item && item.options) ? item.options.map((o,i)=>{
       const picked = s.imageQuizPick===i;
       const showGreen = o.correct && (s.revealed || s.imageQuizPick!=null);
@@ -1122,6 +1272,12 @@ class Component extends DCLogic {
     return {
       // screens
       isHome:s.screen==='home', isSetup, isBoard:s.screen==='board', isPlay:s.screen==='play', isLeaderboard:s.screen==='leaderboard', isSavedList:s.screen==='saved',
+      isSpin:s.screen==='spin', isPickNext:s.screen==='pickNext',
+      spinning:s.spinning, spinHasResult:s.spinResult!=null, showSpinBtn:s.screen==='spin'&&!s.spinning&&s.spinResult==null,
+      spinWinner:s.spinResult!=null&&s.players[s.spinResult]?s.players[s.spinResult].name:'',
+      spinWheel:()=>this.spinWheel(), beginGame:()=>this.beginGame(),
+      boardPhaseLabel: activeCatId ? 'Answer all questions to unlock next topic' : 'Pick a topic',
+      pickNextPlayers: s.players.map((p,i)=>({ ...p, initials:this.ini(p.name), onPick:()=>this.chooseNextPicker(i), cardStyle:'display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(30,16,64,.9),rgba(21,12,48,.95));border:1.5px solid '+p.color+';border-radius:14px;padding:14px 20px;cursor:pointer;box-shadow:0 0 20px '+p.color+'33,0 4px 16px rgba(0,0,0,.4);min-width:180px' })),
       goHome:()=>this.goHome(), goSetup:()=>this.goSetup(), goSaved:()=>this.goSaved(),
       showHostBadge: !!this.props.showHostBadge,
       showTagline: !!this.props.showTagline,
@@ -1153,13 +1309,18 @@ class Component extends DCLogic {
       timeLabel:this.fmt(s.timeLeft), timerColor:ringCol,
       timerRing:'conic-gradient('+ringCol+' 0deg '+deg+'deg, rgba(255,255,255,.1) '+deg+'deg 360deg)',
       timerAnim: (s.running&&low) ? 'animation:pulse 1s ease-in-out infinite' : '',
-      stageStyle: (isImageQ || isImageQuizQ) ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
+      stageStyle: (isImageQ || isImageQuizQ || (isChampQ && champType==='caption')) ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
       showImage: isImageQ && !!curImage, showImagePlaceholder: isImageQ && !curImage,
       showImageQuizBlock: isImageQuizQ,
       showImageQuizImage: isImageQuizQ && !!curImage, showImageQuizPlaceholder: isImageQuizQ && !curImage,
-      showTriviaBlock: isTriviaQ, showChampBlock: isChampQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
+      showTriviaBlock: isTriviaQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
+      showChampQA: isChampQ && champType==='qa',
+      showChampList: isChampQ && champType==='list',
+      showChampCaption: isChampQ && champType==='caption',
+      champListItems, noChampCaptionImage: isChampQ && champType==='caption' && !curImage,
+      champCaptionImgStyle: 'width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
       curImageStyle: 'width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
-      curImageQuizStyle: 'width:100%;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
+      curImageQuizStyle: 'width:100%;height:100%;background-size:contain;background-color:#0d0722;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
       showZoomOverlay: s.imageZoomed && isImageQuizQ && !!curImage,
       zoomImageStyle: 'width:90vw;height:90vh;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(curImage||'')+')',
       onZoomImage:()=>this.zoomImage(), onCloseZoom:()=>this.closeZoom(),
@@ -1173,7 +1334,7 @@ class Component extends DCLogic {
       beeCenterClick:()=>this.beeType(beeCenter && beeCenter!=='?'?beeCenter:''), beeDelete:()=>this.beeDelete(), beeShuffle:()=>this.beeShuffle(), beeEnter:()=>this.beeEnter(),
       goToPlayers:()=>this.goToPlayers(),
       curAnswer: item && item.answer ? item.answer : 'Not set',
-      showBottomControls: isImageQ || isChampQ,
+      showBottomControls: isImageQ || (isChampQ && champType!=='caption'),
       revealed:s.revealed, notRevealed:!s.revealed, reveal:()=>this.reveal(), backToPuzzle:()=>this.backToPuzzle(),
       playToggle:()=>this.playToggle(), playIcon: s.running?'ti-player-pause':'ti-player-play', playLabel: s.running?'Pause':'Start timer',
       backToBoard:()=>this.backToBoard(),
