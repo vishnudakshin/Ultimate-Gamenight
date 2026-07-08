@@ -188,6 +188,7 @@ input:focus,textarea:focus{outline:none}
                     <sc-if value="{{ it.noImage }}"><i class="ti ti-photo-up" style="font-size:26px;color:#a98fd0"></i><span style="font:600 9px monospace;color:#c9b6ee">UPLOAD IMAGE</span></sc-if>
                     <input type="file" accept="image/*" onChange="{{ it.onUpload }}" style="display:none">
                   </label>
+                  <sc-if value="{{ it.showPrompt }}"><input placeholder="Question (e.g. Who is this?)" onChange="{{ it.onPrompt }}" value="{{ it.prompt }}" style="width:100%;background:#0d0722;border:1px solid rgba(192,132,252,.25);border-radius:8px;color:#F3E8FF;font:600 11px 'Poppins';padding:8px"></sc-if>
                   <input placeholder="Answer (revealed by host)" onChange="{{ it.onAnswer }}" value="{{ it.answer }}" style="width:100%;background:#0d0722;border:1px solid rgba(244,201,93,.25);border-radius:8px;color:#F4C95D;font:600 11px 'Poppins';padding:8px">
                   <input placeholder="Hint (optional)" onChange="{{ it.onHint }}" value="{{ it.hint }}" style="width:100%;background:#0d0722;border:1px solid rgba(192,132,252,.18);border-radius:8px;color:#E9D5FF;font:500 11px 'Poppins';padding:8px">
                 </div>
@@ -404,17 +405,17 @@ input:focus,textarea:focus{outline:none}
     <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(244,201,93,.05) 50%,transparent 58%);animation:sweep 9s ease-in-out infinite;pointer-events:none"></div>
     <button onClick="{{ goToPlayers }}" style="position:absolute;left:30px;top:26px;z-index:5;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(192,132,252,.4);color:#c9b6ee;font:700 12px 'Poppins';border-radius:999px;padding:9px 16px;cursor:pointer"><i class="ti ti-arrow-left" style="font-size:14px"></i>Players</button>
     <div style="position:relative;text-align:center;margin-bottom:10px">
-      <div style="font:700 10px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">{{ boardPhaseLabel }}</div>
-      <div style="font:400 clamp(26px,4vw,42px) 'Anton';color:#F4C95D;letter-spacing:.02em">{{ pickerName }}'S TURN</div>
+      <div style="font:700 13px 'Poppins';letter-spacing:.28em;color:#C084FC;text-transform:uppercase">{{ boardPhaseLabel }}</div>
+      <div style="font:400 clamp(36px,6vw,64px) 'Anton';color:#F4C95D;letter-spacing:.02em">{{ pickerName }}'S TURN</div>
     </div>
-    <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1100px;margin:20px auto 0">
+    <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:1100px;margin:20px auto 0">
       <sc-for list="{{ boardCats }}" as="bc" hint-placeholder-count="4">
         <div onClick="{{ bc.onSelect }}" style="{{ bc.boxStyle }}">
           <!-- header row: icon + name always visible -->
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:34px;height:34px;border-radius:10px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.18);display:flex;align-items:center;justify-content:center;flex:none"><i class="ti {{ bc.icon }}" style="font-size:17px;color:#F4C95D"></i></div>
+            <div style="width:50px;height:50px;border-radius:12px;background:rgba(244,201,93,.1);border:1px solid rgba(244,201,93,.18);display:flex;align-items:center;justify-content:center;flex:none"><i class="ti {{ bc.icon }}" style="font-size:26px;color:#F4C95D"></i></div>
             <div style="min-width:0;flex:1">
-              <div style="font:800 13px 'Poppins';color:#fff2cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ bc.punTitle }}</div>
+              <div style="font:800 16px 'Poppins';color:#fff2cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ bc.punTitle }}</div>
               <sc-if value="{{ bc.isChampCat }}"><div style="display:inline-flex;align-items:center;gap:3px;margin-top:3px;background:rgba(244,201,93,.15);border:1px solid rgba(244,201,93,.45);border-radius:5px;padding:2px 6px"><i class="ti ti-crown" style="font-size:8px;color:#F4C95D"></i><span style="font:700 7px 'Poppins';letter-spacing:.1em;text-transform:uppercase;color:#F4C95D">Final Round</span></div></sc-if>
             </div>
           </div>
@@ -633,6 +634,7 @@ input:focus,textarea:focus{outline:none}
             </div>
           </sc-if>
         </div>
+        <sc-if value="{{ showImagePrompt }}"><div style="flex:none;padding:12px 0 2px;text-align:center"><div style="font:700 clamp(15px,2vw,22px) 'Poppins';color:#F3E8FF;text-wrap:balance">{{ curImagePrompt }}</div></div></sc-if>
         <!-- answer reveal (image kind only) -->
         <div style="flex:none;margin-top:12px;display:flex;align-items:center;justify-content:center;min-height:52px">
           <sc-if value="{{ showBottomControls }}">
@@ -763,7 +765,7 @@ class Component extends DCLogic {
       { id:'geo', name:'Guess the Location', icon:'ti-world', tag:'GEO', kind:'imagequiz', questions:5, timer:30, points:10, on:true },
       { id:'logo', name:'Guess the Logo', icon:'ti-building-store', tag:'LOGO', kind:'image', questions:8, timer:15, points:10, on:true },
       { id:'flag', name:'Guess the Flag', icon:'ti-flag', tag:'FLAG', kind:'imagequiz', questions:8, timer:15, points:10, on:false },
-      { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'imagequiz', questions:6, timer:20, points:10, on:false },
+      { id:'who', name:'Guess the Person', icon:'ti-user-circle', tag:'WHO', kind:'image', questions:6, timer:20, points:10, on:false },
       { id:'wordle', name:'Wordle', icon:'ti-square-letter-w', tag:'WORD', kind:'wordle', questions:3, timer:60, points:5, on:false },
       { id:'conn', name:'Connections', icon:'ti-grid-dots', tag:'CONN', kind:'grid', questions:2, timer:180, points:8, on:true },
       { id:'bee', name:'Spelling Bee', icon:'ti-hexagon', tag:'BEE', kind:'bee', questions:3, timer:90, points:5, on:false },
@@ -784,7 +786,7 @@ class Component extends DCLogic {
     if (kind==='grid') return Array.from({ length:n }, () => ({ groups:[0,1,2,3].map(()=>({ name:'', words:['','','',''] })), hint:'', points:8 }));
     if (kind==='wordle') return Array.from({ length:n }, () => ({ word:'', hint:'', points:5 }));
     if (kind==='bee') return Array.from({ length:n }, () => ({ word:'', center:'', hint:'', points:0 }));
-    return Array.from({ length:n }, () => ({ image:null, answer:'', hint:'', points:10 }));
+    return Array.from({ length:n }, () => ({ image:null, prompt:'', answer:'', hint:'', points:10 }));
   }
   buildPlayers() {
     const C = this.COLORS;
@@ -921,7 +923,8 @@ class Component extends DCLogic {
       const answered = cat ? {...s.answered, [cat.id+'_'+s.curQIdx]:true} : s.answered;
       const activeCat = s.cats.find(c=>c.id===s.activeCatId);
       const catAllDone = activeCat ? activeCat.items.every((_,i)=>!!answered[activeCat.id+'_'+i]) : false;
-      return { screen: catAllDone ? 'pickNext' : 'board', answered, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null };
+      const nextPickerIdx = catAllDone ? s.pickerIdx : (s.players.length > 0 ? (s.pickerIdx + 1) % s.players.length : s.pickerIdx);
+      return { screen: catAllDone ? 'pickNext' : 'board', answered, revealed:false, running:false, showConnAnswer:false, triviaPick:null, imageQuizPick:null, hintRevealed:false, imageZoomed:false, lastAward:null, pickerIdx: nextPickerIdx };
     });
   }
   reveal(){
@@ -1030,11 +1033,12 @@ class Component extends DCLogic {
       const base = { num:idx+1, isImageKind, isImageQuizKind, isTriviaKind, isChampKind, isGridKind, isWordleKind, isBeeKind, points:(it.points!=null?it.points:0), pInc:()=>stepItemP(1), pDec:()=>stepItemP(-1), showPoints:!isBeeKind&&!isWordleKind&&!isGridKind, hint:it.hint||'', onHint:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.hint=ev.target.value; return x; }) };
       if(isImageKind){
         const hasImage = !!it.image;
-        return { ...base, hasImage, noImage: !it.image, answer:it.answer,
+        return { ...base, hasImage, noImage: !it.image, answer:it.answer, prompt:it.prompt||'', showPrompt: selCat.id==='who',
           imgBoxStyle: 'width:100%;height:110px;border-radius:8px;background-size:contain;background-color:#0d0722;background-position:center;background-repeat:no-repeat;background-image:url('+JSON.stringify(it.image||'')+')',
           dropStyle:'cursor:pointer;border:1px dashed rgba(192,132,252,.4);border-radius:10px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:repeating-linear-gradient(45deg,#1c1140,#1c1140 10px,#170e34 10px,#170e34 20px);overflow:hidden',
           onUpload:(ev)=>this.uploadImg(selCat.id, idx, ev),
           onAnswer:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.answer=ev.target.value; return x; }),
+          onPrompt:(ev)=>this.patchItem(selCat.id, idx, x=>{ x.prompt=ev.target.value; return x; }),
         };
       }
       if(isImageQuizKind){
@@ -1137,31 +1141,38 @@ class Component extends DCLogic {
       const isChampCat = bc.kind==='championship';
       const showQButtons = isActive;
       const showAllDone = isActive && allDone;
+      const _catItemPts = Array.from({length:bc.questions},(_,i)=> bc.items[i]&&bc.items[i].points!=null ? bc.items[i].points : bc.points);
+      const _avgPts = _catItemPts.length > 0 ? _catItemPts.reduce((a,b)=>a+b,0)/_catItemPts.length : bc.points;
       const qButtons = isActive ? Array.from({length:bc.questions},(_,i)=>{
         const done = !!s.answered[bc.id+'_'+i];
+        const itemPts = bc.items[i]&&bc.items[i].points!=null ? bc.items[i].points : bc.points;
+        const isBonus = !done && itemPts > _avgPts;
         return { label:String(i+1), disabled:done,
           onClick: done ? (()=>{}) : (()=>this.pickQuestion(bc.id,i)),
           style: done
             ? 'width:44px;height:44px;border-radius:9px;background:rgba(192,132,252,.05);border:1px solid rgba(192,132,252,.1);color:#3a2a5c;font:700 14px Poppins;cursor:default;pointer-events:none'
-            : 'width:44px;height:44px;border-radius:9px;background:linear-gradient(160deg,rgba(244,201,93,.18),rgba(244,201,93,.06));border:1.5px solid rgba(244,201,93,.8);color:#F4C95D;font:700 14px Poppins;cursor:pointer;box-shadow:0 2px 10px rgba(244,201,93,.18),inset 0 1px 0 rgba(255,255,255,.1)',
+            : isBonus
+              ? 'width:44px;height:44px;border-radius:9px;background:linear-gradient(160deg,rgba(248,113,113,.22),rgba(248,113,113,.07));border:1.5px solid rgba(248,113,113,.8);color:#f87171;font:700 14px Poppins;cursor:pointer;box-shadow:0 2px 10px rgba(248,113,113,.22),inset 0 1px 0 rgba(255,255,255,.1)'
+              : 'width:44px;height:44px;border-radius:9px;background:linear-gradient(160deg,rgba(244,201,93,.18),rgba(244,201,93,.06));border:1.5px solid rgba(244,201,93,.8);color:#F4C95D;font:700 14px Poppins;cursor:pointer;box-shadow:0 2px 10px rgba(244,201,93,.18),inset 0 1px 0 rgba(255,255,255,.1)',
         };
       }) : [];
       const onSelect = (!activeCatId && !allDone) ? (()=>this.selectActiveCat(bc.id)) : (()=>{});
       // box style
+      const _sqBase = 'aspect-ratio:1;display:flex;flex-direction:column;justify-content:center;';
       let boxStyle;
       if (allDone) {
-        boxStyle = 'background:#0d0722;border:1px solid rgba(192,132,252,.07);border-radius:16px;padding:16px;opacity:.3;pointer-events:none';
+        boxStyle = _sqBase+'background:#0d0722;border:1px solid rgba(192,132,252,.07);border-radius:16px;padding:20px;opacity:.3;pointer-events:none';
       } else if (isActive) {
         boxStyle = isChampCat
           ? 'background:linear-gradient(145deg,rgba(58,38,4,.96),rgba(36,24,2,.98));border:2px solid #F4C95D;border-radius:16px;padding:18px;box-shadow:0 0 32px rgba(244,201,93,.22),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,217,80,.18)'
           : 'background:linear-gradient(145deg,rgba(30,16,64,.92),rgba(21,12,48,.96));border:1.5px solid rgba(244,201,93,.55);border-radius:16px;padding:18px;box-shadow:0 0 24px rgba(244,201,93,.15),0 4px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)';
       } else if (isLocked) {
-        boxStyle = 'background:rgba(13,7,34,.5);border:1px solid rgba(192,132,252,.08);border-radius:16px;padding:16px;opacity:.35;pointer-events:none';
+        boxStyle = _sqBase+'background:rgba(13,7,34,.5);border:1px solid rgba(192,132,252,.08);border-radius:16px;padding:20px;opacity:.35;pointer-events:none';
       } else {
         // phase 1 — compact, clickable
         boxStyle = isChampCat
-          ? 'background:linear-gradient(145deg,rgba(58,38,4,.92),rgba(36,24,2,.95));border:2px solid rgba(244,201,93,.7);border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 0 20px rgba(244,201,93,.15),0 3px 14px rgba(0,0,0,.4)'
-          : 'background:linear-gradient(145deg,rgba(30,16,64,.88),rgba(21,12,48,.92));border:1px solid rgba(244,201,93,.22);border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)';
+          ? _sqBase+'background:linear-gradient(145deg,rgba(58,38,4,.92),rgba(36,24,2,.95));border:2px solid rgba(244,201,93,.7);border-radius:14px;padding:20px;cursor:pointer;box-shadow:0 0 20px rgba(244,201,93,.15),0 3px 14px rgba(0,0,0,.4)'
+          : _sqBase+'background:linear-gradient(145deg,rgba(30,16,64,.88),rgba(21,12,48,.92));border:1px solid rgba(244,201,93,.22);border-radius:14px;padding:20px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)';
       }
       return { ...bc, punTitle:this.PUNS[bc.id]||bc.name, remaining, allDone, isActive, isLocked, isChampCat, showQButtons, showAllDone, qButtons, boxStyle, onSelect };
     });
@@ -1181,6 +1192,7 @@ class Component extends DCLogic {
     const isWordleQ = !!cat && cat.kind==='wordle';
     const isBeeQ = !!cat && cat.kind==='bee';
     const curImage = ((isImageQ || isImageQuizQ || (isChampQ && item && item.champType==='caption')) && item) ? item.image : null;
+    const curImagePrompt = (isImageQ && cat && cat.id==='who' && item && item.prompt) ? item.prompt : '';
     const curHint = (item && item.hint) ? item.hint : '';
     const curPrompt = ((isTriviaQ || (isChampQ && item && item.champType==='qa')) && item) ? (item.prompt||'(No question typed yet)') : '';
     const champType = (isChampQ && item) ? (item.champType||'qa') : null;
@@ -1311,6 +1323,7 @@ class Component extends DCLogic {
       timerAnim: (s.running&&low) ? 'animation:pulse 1s ease-in-out infinite' : '',
       stageStyle: (isImageQ || isImageQuizQ || (isChampQ && champType==='caption')) ? 'background:#0a0614;border:1px solid rgba(192,132,252,.16)' : 'background:linear-gradient(160deg,#1a1140,#0d0722);border:1px solid rgba(192,132,252,.2)',
       showImage: isImageQ && !!curImage, showImagePlaceholder: isImageQ && !curImage,
+      showImagePrompt: !!curImagePrompt, curImagePrompt,
       showImageQuizBlock: isImageQuizQ,
       showImageQuizImage: isImageQuizQ && !!curImage, showImageQuizPlaceholder: isImageQuizQ && !curImage,
       showTriviaBlock: isTriviaQ, showConnPuzzle: isConnQ, showWordle: isWordleQ, showBee: isBeeQ,
